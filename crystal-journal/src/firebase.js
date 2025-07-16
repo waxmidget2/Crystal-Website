@@ -4,13 +4,12 @@ import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBj7aO6OYaiud2mrCNxugHZLOG9Kl1zouk",
-  authDomain: "crystal-website-8bc5a.firebaseapp.com",
-  projectId: "crystal-website-8bc5a",
-  storageBucket: "crystal-website-8bc5a.firebasestorage.app",
-  messagingSenderId: "671739708349",
-  appId: "1:671739708349:web:0de1e972cd1794ecc788d4",
-  measurementId: "G-Q9XXW0S447"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
 // Initialize Firebase
