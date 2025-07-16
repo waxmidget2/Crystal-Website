@@ -10,7 +10,7 @@ export default function Navbar({ isRainbowMode, toggleRainbowMode, cycleBackgrou
   return (
     <nav className="navbar glass-ui">
       <div className="nav-left-group">
-        <h1 className="navbar-title">🔮 Crystal Journal</h1>
+        <h1 className="navbar-title">Crystal Journal</h1>
         <button 
           className="nav-button" 
           onClick={toggleRainbowMode}
