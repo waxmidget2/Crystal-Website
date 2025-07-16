@@ -1,76 +1,115 @@
 /* src/index.css */
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+/* Import a more playful font */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
 
 :root {
-    --bg-color: #1a1a2e;
-    --primary-accent: #e94560;
-    --secondary-accent: #4a90e2;
-    --glass-bg: rgba(255, 255, 255, 0.08);
-    --glass-border: rgba(255, 255, 255, 0.15);
-    --font-color: #f0f0f0;
-    --font-color-muted: #a0a0c0;
+    --bg-color: #2c2a4a; /* Deeper purple */
+    --primary-accent: #ff79c6; /* Hot Pink */
+    --secondary-accent: #8be9fd; /* Cyan */
+    --tertiary-accent: #50fa7b; /* Lime Green */
+    --glass-bg: rgba(255, 255, 255, 0.09);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --font-color: #f8f8f2;
+    --font-color-muted: #bd93f9; /* Light Purple */
     --border-radius-main: 20px;
     --backdrop-blur: 12px;
+}
+
+/* --- Rainbow Dash Mode! (Konami Code Easter Egg) --- */
+.rainbow-dash-mode {
+    --primary-accent: #ff5555; /* Red */
+    --secondary-accent: #ffb86c; /* Orange */
+    --tertiary-accent: #f1fa8c; /* Yellow */
+    --font-color-muted: #50fa7b; /* Green */
+}
+.rainbow-dash-mode .navbar-title {
+    animation: rainbow-text 3s infinite linear;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Nunito', sans-serif; /* New font */
     background-color: var(--bg-color);
     color: var(--font-color);
-    background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0);
-    background-size: 25px 25px;
     overflow-x: hidden;
 }
 
+/* --- Sparkle Background --- */
 .App {
     width: 100vw;
     min-height: 100vh;
-    padding: 5vh 5vw; /* 90% padded feel */
+    padding: 5vh 5vw;
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: relative;
+    z-index: 1;
+}
+
+.sparkle-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8"><path d="M4 0 L5 3 L8 4 L5 5 L4 8 L3 5 L0 4 L3 3 Z" fill="rgba(255,255,255,0.3)"/></svg>'),
+        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8"><path d="M4 0 L5 3 L8 4 L5 5 L4 8 L3 5 L0 4 L3 3 Z" fill="rgba(255,255,255,0.3)"/></svg>');
+    background-repeat: repeat;
+    background-size: 200px, 300px;
+    animation: sparkle 60s linear infinite;
+    z-index: -1;
+}
+
+@keyframes sparkle {
+    from { background-position: 0 0, 0 0; }
+    to { background-position: -1000px 500px, -500px 1000px; }
+}
+
+@keyframes rainbow-text {
+    0% { color: #ff5555; }
+    17% { color: #ffb86c; }
+    34% { color: #f1fa8c; }
+    51% { color: #50fa7b; }
+    68% { color: #8be9fd; }
+    85% { color: #bd93f9; }
+    100% { color: #ff79c6; }
 }
 
 /* --- Shared UI Components --- */
 .glass-ui {
     background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
+    border: 2px solid var(--glass-border);
     border-radius: var(--border-radius-main);
     backdrop-filter: blur(var(--backdrop-blur));
     -webkit-backdrop-filter: blur(var(--backdrop-blur));
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    transition: border-color 0.3s ease;
+}
+.glass-ui:hover {
+    border-color: var(--primary-accent);
 }
 
 .action-button {
     padding: 12px 28px;
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 700; /* Bolder */
     color: var(--font-color);
     border: none;
     border-radius: var(--border-radius-main);
     cursor: pointer;
     transition: all 0.3s ease;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 .action-button.primary { background-color: var(--primary-accent); }
 .action-button.secondary { background-color: var(--secondary-accent); }
 .action-button:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px) scale(1.05);
     box-shadow: 0 8px 20px rgba(0,0,0, 0.3);
 }
-.action-button:disabled {
-    background-color: #555;
-    cursor: not-allowed;
-}
-
-/* --- Loader --- */
-.loader-container {
-    display: flex; justify-content: center; align-items: center;
-    height: 80vh; flex-direction: column; gap: 20px;
-}
-@keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } }
-.loader-crystal { font-size: 50px; animation: pulse 2s infinite ease-in-out; }
+.action-button:disabled { background-color: #555; cursor: not-allowed; }
 
 /* --- Navbar --- */
 .navbar {
@@ -78,7 +117,7 @@ body {
     justify-content: space-between; align-items: center;
     margin-bottom: 40px; padding: 10px 20px;
 }
-.navbar-title { font-size: 1.5rem; font-weight: 600; }
+.navbar-title { font-size: 1.8rem; font-weight: 700; }
 
 /* --- Homepage --- */
 .homepage-header {
@@ -93,47 +132,58 @@ body {
 .crystal-button {
     position: relative; height: 280px; border-radius: var(--border-radius-main);
     overflow: hidden; cursor: pointer; transition: all 0.4s ease;
-    border: 1px solid var(--glass-border);
-    color: white;
-    text-decoration: none;
+    color: white; text-decoration: none;
 }
+.crystal-link { color: white; text-decoration: none; }
 .crystal-button:hover { transform: scale(1.05) rotate(1deg); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); }
 .crystal-button img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
 .crystal-button:hover img { transform: scale(1.1); }
 .crystal-button-label {
     position: absolute; bottom: 0; left: 0; width: 100%;
-    padding: 15px; text-align: center; font-weight: 600;
-    font-size: 1.1rem; color: white;
+    padding: 15px; text-align: center; font-weight: 700;
+    font-size: 1.2rem;
     background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
     backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
 }
 
-/* --- Add Crystal Form --- */
-.add-crystal-form {
-    padding: 30px; margin-bottom: 30px; width: 100%; max-width: 600px;
-    display: flex; flex-direction: column; gap: 20px;
-    animation: fadeIn 0.5s ease-in-out;
+/* --- MLP Easter Egg on Homepage --- */
+.mlp-easter-egg-icon {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 1.5rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    z-index: 10;
 }
+
+/* --- Crystal Page --- */
+.journal-area { flex: 1; min-width: 300px; display: flex; flex-direction: column; }
+.journal-textarea { width: 100%; height: 100%; padding: 25px; color: var(--font-color); font-family: 'Nunito', sans-serif; font-size: 1.2rem; line-height: 1.7; resize: none; border: none; background: transparent; }
+
+/* --- 20% Cooler Easter Egg --- */
+.twenty-percent-cooler {
+    background: linear-gradient(45deg, var(--primary-accent), var(--secondary-accent), var(--tertiary-accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+}
+
+/* --- Other styles from previous steps (Loader, Forms, etc.) --- */
+/* These are mostly unchanged but are included for completeness */
+.loader-container { display: flex; justify-content: center; align-items: center; height: 80vh; flex-direction: column; gap: 20px; }
+.loader-crystal { font-size: 50px; animation: pulse 2s infinite ease-in-out; }
+@keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } }
+.add-crystal-form { padding: 30px; margin-bottom: 30px; width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 20px; animation: fadeIn 0.5s ease-in-out; }
 .form-title { text-align: center; margin-bottom: 10px; }
 .form-group { display: flex; flex-direction: column; gap: 8px; }
 .form-group label { font-weight: 600; color: var(--font-color-muted); }
-.form-group input, .form-group textarea {
-    width: 100%; padding: 12px; font-size: 1rem;
-    background-color: rgba(0,0,0,0.2); border: 1px solid var(--glass-border);
-    border-radius: 10px; color: var(--font-color);
-}
+.form-group input, .form-group textarea { width: 100%; padding: 12px; font-size: 1rem; background-color: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 10px; color: var(--font-color); }
 .form-group input:focus, .form-group textarea:focus { outline: 2px solid var(--primary-accent); }
 .form-group textarea { resize: vertical; min-height: 100px; }
 .form-group input[type="file"] { padding: 5px; }
-.form-group input[type="file"]::file-selector-button {
-    padding: 8px 15px; border: none; border-radius: 8px;
-    background-color: var(--secondary-accent); color: white;
-    cursor: pointer; transition: background-color 0.2s;
-}
+.form-group input[type="file"]::file-selector-button { padding: 8px 15px; border: none; border-radius: 8px; background-color: var(--secondary-accent); color: white; cursor: pointer; transition: background-color 0.2s; }
 .form-group input[type="file"]::file-selector-button:hover { background-color: #3a80d2; }
 .form-error { color: var(--primary-accent); text-align: center; }
-
-/* --- Crystal Page Layout --- */
 .crystal-page-container { width: 100%; max-width: 1400px; animation: fadeIn 0.5s ease-in-out; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 .crystal-page-layout { display: flex; flex-wrap: wrap; gap: 30px; width: 100%; height: 75vh; }
@@ -141,46 +191,10 @@ body {
 .summary-image { width: 200px; height: 200px; object-fit: cover; border-radius: 50%; margin-bottom: 20px; border: 5px solid; box-shadow: 0 0 25px rgba(255,255,255,0.1); }
 .summary-title { font-size: 2.8rem; margin-bottom: 15px; font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.4); }
 .summary-text { font-size: 1.1rem; line-height: 1.7; color: var(--font-color-muted); }
-.journal-area { flex: 1; min-width: 300px; display: flex; flex-direction: column; }
-.journal-textarea { width: 100%; height: 100%; padding: 25px; color: var(--font-color); font-family: 'Poppins', sans-serif; font-size: 1.1rem; line-height: 1.6; resize: none; border: none; background: transparent; }
-.journal-textarea:focus { outline: 2px solid var(--primary-accent); box-shadow: 0 0 20px rgba(233, 69, 96, 0.3); }
-.journal-textarea::placeholder { color: var(--font-color-muted); }
 .journal-login-prompt { display: flex; align-items: center; justify-content: center; text-align: center; height: 100%; flex-direction: column; gap: 15px; }
 .back-button { display: inline-block; margin-bottom: 25px; font-size: 1rem; text-decoration: none; color: var(--font-color); padding: 10px 20px; cursor: pointer; transition: all 0.3s ease; }
 .back-button:hover { background-color: var(--primary-accent); transform: translateX(-5px); }
-/* Add these styles to the bottom of src/index.css */
-
-.crystal-button {
-    /* The position: relative is already there, but ensure it is */
-    position: relative; 
-}
-
-.delete-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 30px;
-    height: 30px;
-    background-color: rgba(233, 69, 96, 0.8); /* --primary-accent with opacity */
-    color: white;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    font-weight: bold;
-    z-index: 10;
-    transition: all 0.2s ease;
-    opacity: 0; /* Hidden by default */
-}
-
-.crystal-button:hover .delete-button {
-    opacity: 1; /* Show on hover */
-}
-
-.delete-button:hover {
-    background-color: #e94560; /* Full color on hover */
-    transform: scale(1.1);
-}
+.delete-button { position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; background-color: rgba(233, 69, 96, 0.8); color: white; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: bold; z-index: 10; transition: all 0.2s ease; opacity: 0; }
+.crystal-button:hover .delete-button { opacity: 1; }
+.delete-button:hover { background-color: #e94560; transform: scale(1.1); }
+.footer { margin-top: 40px; color: var(--font-color-muted); opacity: 0.7; }

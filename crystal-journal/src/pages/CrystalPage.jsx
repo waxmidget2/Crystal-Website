@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+// src/pages/CrystalPage.jsx
+
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db, auth } from '../firebase';
@@ -13,7 +15,12 @@ export default function CrystalPage() {
   const [note, setNote] = useState('');
   const [loading, setLoading] = useState(true);
 
-  // Debounced save function
+  // --- 20% Cooler Easter Egg ---
+  // useMemo will only recalculate when the 'note' changes
+  const isCooler = useMemo(() => {
+    return note.toLowerCase().includes('20% cooler');
+  }, [note]);
+
   const debouncedSave = useCallback(
     debounce(async (newNote) => {
       if (user && crystal) {
@@ -28,14 +35,11 @@ export default function CrystalPage() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // Fetch crystal summary
         const crystalRef = doc(db, 'crystals', crystalId);
         const crystalSnap = await getDoc(crystalRef);
         if (crystalSnap.exists()) {
           setCrystal({ id: crystalSnap.id, ...crystalSnap.data() });
         }
-
-        // Fetch user's note for this crystal
         if (user) {
           const noteRef = doc(db, 'users', user.uid, 'notes', crystalId);
           const noteSnap = await getDoc(noteRef);
@@ -51,7 +55,6 @@ export default function CrystalPage() {
         setLoading(false);
       }
     };
-
     fetchData();
   }, [crystalId, user]);
 
@@ -75,10 +78,11 @@ export default function CrystalPage() {
         <main className="journal-area glass-ui">
           {user ? (
             <textarea
-              className="journal-textarea"
+              // Apply the special class if the easter egg is found!
+              className={`journal-textarea ${isCooler ? 'twenty-percent-cooler' : ''}`}
               value={note}
               onChange={handleNoteChange}
-              placeholder={`My personal notes on ${crystal.name}...`}
+              placeholder={`My personal thoughts & feelings about ${crystal.name}...`}
             />
           ) : (
             <div className="journal-login-prompt">
