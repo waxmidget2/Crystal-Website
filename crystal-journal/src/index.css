@@ -1,0 +1,194 @@
+/* --- Global Styles & Fonts --- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+:root {
+  --bg-color: #1a1a2e;
+  --primary-color: #e94560;
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --font-color: #f0f0f0;
+  --border-radius-main: 20px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--font-color);
+  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.1) 1px, transparent 0);
+  background-size: 20px 20px;
+  overflow-x: hidden;
+}
+
+/* --- Main App Layout & Padding --- */
+.App {
+  width: 100vw;
+  min-height: 100vh;
+  padding: 5vh 5vw; /* This achieves the padded/contained feel */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* --- Loader Style --- */
+.loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+}
+
+/* --- Nav & Auth Button --- */
+.navbar {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 40px;
+}
+
+.auth-button {
+  padding: 10px 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--font-color);
+  background: var(--card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--border-radius-main);
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+.auth-button:hover {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+/* --- Crystal Button Grid (Homepage) --- */
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 25px;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.crystal-button {
+  position: relative;
+  height: 250px;
+  border-radius: var(--border-radius-main);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.crystal-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(233, 69, 96, 0.5);
+}
+.crystal-button img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.crystal-button-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 15px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: white;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+/* --- Crystal Page Layout --- */
+.crystal-page-layout {
+  display: flex;
+  gap: 30px;
+  width: 100%;
+  max-width: 1400px;
+  height: 75vh;
+}
+
+/* Left Sidebar (50% of parent width) */
+.crystal-summary-sidebar {
+  flex-basis: 50%;
+  background: var(--card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--border-radius-main);
+  padding: 30px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.summary-image {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-bottom: 20px;
+  border: 4px solid var(--primary-color);
+}
+.summary-title {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+}
+.summary-text {
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+/* Right Side Note Area */
+.journal-area {
+  flex-basis: 50%;
+  display: flex;
+  flex-direction: column;
+}
+.journal-textarea {
+  width: 100%;
+  height: 100%;
+  padding: 25px;
+  background: var(--card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--border-radius-main);
+  color: var(--font-color);
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.1rem;
+  resize: none;
+}
+.journal-textarea:focus {
+  outline: 2px solid var(--primary-color);
+}
+
+.back-button {
+  position: absolute;
+  top: 30px;
+  left: 30px;
+  font-size: 1rem;
+  text-decoration: none;
+  color: var(--font-color);
+  background-color: var(--card-bg);
+  padding: 8px 16px;
+  border-radius: var(--border-radius-main);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.back-button:hover {
+    background-color: var(--primary-color);
+}
