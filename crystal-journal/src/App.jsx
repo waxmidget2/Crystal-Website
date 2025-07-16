@@ -6,52 +6,29 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from './firebase';
 
 import Navbar from './components/Navbar';
-import HomePage from './pages/HomePage';
-import CrystalPage from './pages/CrystalPage';
 import Loader from './components/Loader';
-
-// Define our available background effects
-const backgroundEffects = ['sparkle', 'aurora', 'constellation', 'none'];
+import JournalListPage from './pages/JournalListPage';
+import JournalPage from './pages/JournalPage';
+import ItemPage from './pages/ItemPage';
 
 function App() {
   const [user, loading] = useAuthState(auth);
-  const [isRainbowMode, setIsRainbowMode] = useState(false);
-  const [bgEffectIndex, setBgEffectIndex] = useState(0); // Start with 'sparkle'
-
-  const toggleRainbowMode = () => {
-    setIsRainbowMode(prevMode => !prevMode);
-  };
-
-  // Function to cycle to the next background effect
-  const cycleBackgroundEffect = () => {
-    setBgEffectIndex(prevIndex => (prevIndex + 1) % backgroundEffects.length);
-  };
-
-  // Get the current effect's class name
-  const currentBgClass = `bg-${backgroundEffects[bgEffectIndex]}`;
-
-  if (loading) {
-    return <Loader />;
-  }
   
+  if (loading) {
+    return <Loader text="Waking up the ponies..." />;
+  }
+
   return (
     <Router>
-      {/* The background container now gets a dynamic class */}
-      <div className={`background-container ${currentBgClass}`}></div>
-
-      <div className={`App ${isRainbowMode ? 'rainbow-dash-mode' : ''}`}>
-        <Navbar 
-          isRainbowMode={isRainbowMode} 
-          toggleRainbowMode={toggleRainbowMode}
-          cycleBackgroundEffect={cycleBackgroundEffect} // Pass the new function
-        />
+      <div className="App">
+        <Navbar />
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/crystal/:crystalId" element={<CrystalPage />} />
+          <Route path="/" element={<JournalListPage user={user} />} />
+          <Route path="/journal/:journalId" element={<JournalPage user={user} />} />
+          <Route path="/journal/:journalId/item/:itemId" element={<ItemPage user={user} />} />
         </Routes>
         <footer className="footer">
-          "Friendship is Magic"
-           I Love You CAMY
+          I Love you Cam Cam
         </footer>
       </div>
     </Router>

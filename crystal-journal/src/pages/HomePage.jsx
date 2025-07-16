@@ -1,107 +1,92 @@
-// src/pages/HomePage.jsx
+// src/pages/JournalPage.jsx
 
 import React, { useState, useEffect } from 'react';
-import { collection, getDocs, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
+import { useParams, Link } from 'react-router-dom';
+import { collection, getDocs, query, orderBy, doc, deleteDoc, getDoc } from 'firebase/firestore';
 import { ref, deleteObject } from 'firebase/storage';
-import { db, storage, auth } from '../firebase';
-import { Link } from 'react-router-dom';
-import { useAuthState } from 'react-firebase-hooks/auth';
+import { db, storage } from '../firebase';
 import Loader from '../components/Loader';
-import AddCrystalForm from '../components/AddCrystalForm';
+import AddItemForm from '../components/AddItemForm'; // Renamed for clarity
 
-// --- MLP Easter Egg Data ---
-const mlpEasterEggs = {
-  "rarity's diamond": "💎",
-  "crystal of friendship": "💖",
-  "element of magic": "✨",
-  "element of loyalty": "🌈",
-  "element of kindness": "🦋",
-  "element of generosity": "💎",
-  "element of honesty": "🍎",
-  "element of laughter": "🎈",
-};
-
-export default function HomePage() {
-  const [user] = useAuthState(auth);
-  const [crystals, setCrystals] = useState([]);
+export default function JournalPage({ user }) {
+  const { journalId } = useParams();
+  const [items, setItems] = useState([]);
+  const [journalName, setJournalName] = useState('');
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
 
   useEffect(() => {
-    const fetchCrystals = async () => {
-      try {
-        const q = query(collection(db, "crystals"), orderBy("createdAt", "desc"));
-        const querySnapshot = await getDocs(q);
-        const crystalsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setCrystals(crystalsData);
-      } catch (err) {
-        console.error("Error fetching crystals:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCrystals();
-  }, []);
+    if (user && journalId) {
+      const fetchJournalData = async () => {
+        // Fetch journal name
+        const journalRef = doc(db, 'users', user.uid, 'journals', journalId);
+        const journalSnap = await getDoc(journalRef);
+        if (journalSnap.exists()) {
+          setJournalName(journalSnap.data().name);
+        }
 
-  const handleCrystalAdded = (newCrystal) => {
-    setCrystals(prevCrystals => [newCrystal, ...prevCrystals]);
+        // Fetch items in the journal
+        const itemsRef = collection(db, 'users', user.uid, 'journals', journalId, 'items');
+        const q = query(itemsRef, orderBy('createdAt', 'desc'));
+        const querySnapshot = await getDocs(q);
+        const journalItems = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setItems(journalItems);
+        setLoading(false);
+      };
+      fetchJournalData();
+    }
+  }, [user, journalId]);
+
+  const handleItemAdded = (newItem) => {
+    setItems(prev => [newItem, ...prev]);
     setShowAddForm(false);
   };
 
-  const handleDelete = async (crystalId, imageUrl) => {
-    if (!window.confirm("Are you sure you want to delete this crystal? This action cannot be undone.")) {
-      return;
-    }
+  const handleDelete = async (itemId, imageUrl) => {
+    if (!window.confirm("Are you sure you want to delete this item?")) return;
     try {
+      // Delete image from Storage
       const imageRef = ref(storage, imageUrl);
       await deleteObject(imageRef);
-      await deleteDoc(doc(db, "crystals", crystalId));
-      setCrystals(prevCrystals => prevCrystals.filter(crystal => crystal.id !== crystalId));
+      // Delete item doc from Firestore
+      await deleteDoc(doc(db, 'users', user.uid, 'journals', journalId, 'items', itemId));
+      setItems(prev => prev.filter(item => item.id !== itemId));
     } catch (error) {
-      console.error("Error deleting crystal: ", error);
-      alert("Failed to delete crystal. You may not have the required permissions.");
+      console.error("Error deleting item: ", error);
+      alert("Failed to delete item.");
     }
   };
 
-  if (loading) return <Loader />;
+  if (loading) return <Loader text={`Loading ${journalName || 'Journal'}...`} />;
 
   return (
     <>
       <div className="homepage-header">
-        <h1>Your Crystal Collection</h1>
-        {user && (
-          <button className="action-button secondary" onClick={() => setShowAddForm(!showAddForm)}>
-            {showAddForm ? 'Cancel' : '＋ Add Crystal'}
-          </button>
-        )}
+        <h1>{journalName}</h1>
+        <button className="action-button secondary" onClick={() => setShowAddForm(!showAddForm)}>
+          {showAddForm ? 'Cancel' : '＋ Add Item'}
+        </button>
       </div>
+      
+      <Link to="/" className="back-to-journals-link">← Back to All Journals</Link>
 
-      {showAddForm && <AddCrystalForm onCrystalAdded={handleCrystalAdded} />}
+      {showAddForm && <AddItemForm journalId={journalId} on-item-added={handleItemAdded} user={user} />}
 
       <div className="home-grid">
-        {crystals.map(crystal => {
-          const crystalNameLower = crystal.name.toLowerCase();
-          const easterEggEmoji = mlpEasterEggs[crystalNameLower];
-
-          return (
-            <div key={crystal.id} className="crystal-button glass-ui">
-              {user && (
-                <button
-                  className="delete-button"
-                  onClick={(e) => { e.preventDefault(); handleDelete(crystal.id, crystal.image); }}
-                  title="Delete Crystal"
-                >&times;</button>
-              )}
-              {/* If an easter egg is found, show the emoji! */}
-              {easterEggEmoji && <span className="mlp-easter-egg-icon">{easterEggEmoji}</span>}
-              
-              <Link to={`/crystal/${crystal.id}`} className="crystal-link">
-                <img src={crystal.image} alt={crystal.name} onError={(e) => { e.target.src='https://placehold.co/400x600/1a1a2e/f0f0f0?text=Crystal'; }} />
-                <div className="crystal-button-label">{crystal.name}</div>
-              </Link>
-            </div>
-          );
-        })}
+        {items.map(item => (
+          <div key={item.id} className="crystal-button glass-ui">
+            <button
+              className="delete-button"
+              onClick={(e) => { e.preventDefault(); handleDelete(item.id, item.image); }}
+              title="Delete Item"
+            >&times;</button>
+            <Link to={`/journal/${journalId}/item/${item.id}`} className="crystal-link">
+              <img src={item.image} alt={item.name} onError={(e) => { e.target.src='https://placehold.co/400x600/1a1a2e/f0f0f0?text=Item'; }} />
+              <div className="crystal-button-label">{item.name}</div>
+            </Link>
+          </div>
+        ))}
+        {items.length === 0 && !showAddForm && <p>This journal is empty. Add your first item!</p>}
       </div>
     </>
   );
