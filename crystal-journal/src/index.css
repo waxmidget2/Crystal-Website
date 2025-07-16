@@ -1,194 +1,150 @@
-/* --- Global Styles & Fonts --- */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+/* src/index.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
 :root {
-  --bg-color: #1a1a2e;
-  --primary-color: #e94560;
-  --card-bg: rgba(255, 255, 255, 0.05);
-  --font-color: #f0f0f0;
-  --border-radius-main: 20px;
+    --bg-color: #1a1a2e;
+    --primary-accent: #e94560;
+    --secondary-accent: #4a90e2;
+    --glass-bg: rgba(255, 255, 255, 0.08);
+    --glass-border: rgba(255, 255, 255, 0.15);
+    --font-color: #f0f0f0;
+    --font-color-muted: #a0a0c0;
+    --border-radius-main: 20px;
+    --backdrop-blur: 12px;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'Poppins', sans-serif;
-  background-color: var(--bg-color);
-  color: var(--font-color);
-  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.1) 1px, transparent 0);
-  background-size: 20px 20px;
-  overflow-x: hidden;
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--font-color);
+    background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0);
+    background-size: 25px 25px;
+    overflow-x: hidden;
 }
 
-/* --- Main App Layout & Padding --- */
 .App {
-  width: 100vw;
-  min-height: 100vh;
-  padding: 5vh 5vw; /* This achieves the padded/contained feel */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+    width: 100vw;
+    min-height: 100vh;
+    padding: 5vh 5vw; /* 90% padded feel */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-/* --- Loader Style --- */
+/* --- Shared UI Components --- */
+.glass-ui {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius-main);
+    backdrop-filter: blur(var(--backdrop-blur));
+    -webkit-backdrop-filter: blur(var(--backdrop-blur));
+}
+
+.action-button {
+    padding: 12px 28px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--font-color);
+    border: none;
+    border-radius: var(--border-radius-main);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.action-button.primary { background-color: var(--primary-accent); }
+.action-button.secondary { background-color: var(--secondary-accent); }
+.action-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0, 0.3);
+}
+.action-button:disabled {
+    background-color: #555;
+    cursor: not-allowed;
+}
+
+/* --- Loader --- */
 .loader-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 80vh;
+    display: flex; justify-content: center; align-items: center;
+    height: 80vh; flex-direction: column; gap: 20px;
 }
+@keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } }
+.loader-crystal { font-size: 50px; animation: pulse 2s infinite ease-in-out; }
 
-/* --- Nav & Auth Button --- */
+/* --- Navbar --- */
 .navbar {
-  width: 100%;
-  max-width: 1200px;
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 40px;
+    width: 100%; max-width: 1200px; display: flex;
+    justify-content: space-between; align-items: center;
+    margin-bottom: 40px; padding: 10px 20px;
 }
+.navbar-title { font-size: 1.5rem; font-weight: 600; }
 
-.auth-button {
-  padding: 10px 25px;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--font-color);
-  background: var(--card-bg);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--border-radius-main);
-  cursor: pointer;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
+/* --- Homepage --- */
+.homepage-header {
+    width: 100%; max-width: 1200px; display: flex;
+    justify-content: space-between; align-items: center;
+    margin-bottom: 20px;
 }
-.auth-button:hover {
-  background: var(--primary-color);
-  border-color: var(--primary-color);
-}
-
-/* --- Crystal Button Grid (Homepage) --- */
 .home-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 25px;
-  width: 100%;
-  max-width: 1200px;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 30px; width: 100%; max-width: 1200px;
+}
+.crystal-button {
+    position: relative; height: 280px; border-radius: var(--border-radius-main);
+    overflow: hidden; cursor: pointer; transition: all 0.4s ease;
+    border: 1px solid var(--glass-border);
+    color: white;
+    text-decoration: none;
+}
+.crystal-button:hover { transform: scale(1.05) rotate(1deg); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); }
+.crystal-button img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+.crystal-button:hover img { transform: scale(1.1); }
+.crystal-button-label {
+    position: absolute; bottom: 0; left: 0; width: 100%;
+    padding: 15px; text-align: center; font-weight: 600;
+    font-size: 1.1rem; color: white;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
 }
 
-.crystal-button {
-  position: relative;
-  height: 250px;
-  border-radius: var(--border-radius-main);
-  overflow: hidden;
-  cursor: pointer;
-  transition: transform 0.3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+/* --- Add Crystal Form --- */
+.add-crystal-form {
+    padding: 30px; margin-bottom: 30px; width: 100%; max-width: 600px;
+    display: flex; flex-direction: column; gap: 20px;
+    animation: fadeIn 0.5s ease-in-out;
 }
-.crystal-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 20px rgba(233, 69, 96, 0.5);
+.form-title { text-align: center; margin-bottom: 10px; }
+.form-group { display: flex; flex-direction: column; gap: 8px; }
+.form-group label { font-weight: 600; color: var(--font-color-muted); }
+.form-group input, .form-group textarea {
+    width: 100%; padding: 12px; font-size: 1rem;
+    background-color: rgba(0,0,0,0.2); border: 1px solid var(--glass-border);
+    border-radius: 10px; color: var(--font-color);
 }
-.crystal-button img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.form-group input:focus, .form-group textarea:focus { outline: 2px solid var(--primary-accent); }
+.form-group textarea { resize: vertical; min-height: 100px; }
+.form-group input[type="file"] { padding: 5px; }
+.form-group input[type="file"]::file-selector-button {
+    padding: 8px 15px; border: none; border-radius: 8px;
+    background-color: var(--secondary-accent); color: white;
+    cursor: pointer; transition: background-color 0.2s;
 }
-.crystal-button-label {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  padding: 15px;
-  text-align: center;
-  font-weight: 600;
-  font-size: 1.1rem;
-  color: white;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-}
+.form-group input[type="file"]::file-selector-button:hover { background-color: #3a80d2; }
+.form-error { color: var(--primary-accent); text-align: center; }
 
 /* --- Crystal Page Layout --- */
-.crystal-page-layout {
-  display: flex;
-  gap: 30px;
-  width: 100%;
-  max-width: 1400px;
-  height: 75vh;
-}
-
-/* Left Sidebar (50% of parent width) */
-.crystal-summary-sidebar {
-  flex-basis: 50%;
-  background: var(--card-bg);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--border-radius-main);
-  padding: 30px;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-.summary-image {
-  width: 200px;
-  height: 200px;
-  object-fit: cover;
-  border-radius: 50%;
-  margin-bottom: 20px;
-  border: 4px solid var(--primary-color);
-}
-.summary-title {
-  font-size: 2.5rem;
-  margin-bottom: 15px;
-}
-.summary-text {
-  font-size: 1.1rem;
-  line-height: 1.6;
-}
-
-/* Right Side Note Area */
-.journal-area {
-  flex-basis: 50%;
-  display: flex;
-  flex-direction: column;
-}
-.journal-textarea {
-  width: 100%;
-  height: 100%;
-  padding: 25px;
-  background: var(--card-bg);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--border-radius-main);
-  color: var(--font-color);
-  font-family: 'Poppins', sans-serif;
-  font-size: 1.1rem;
-  resize: none;
-}
-.journal-textarea:focus {
-  outline: 2px solid var(--primary-color);
-}
-
-.back-button {
-  position: absolute;
-  top: 30px;
-  left: 30px;
-  font-size: 1rem;
-  text-decoration: none;
-  color: var(--font-color);
-  background-color: var(--card-bg);
-  padding: 8px 16px;
-  border-radius: var(--border-radius-main);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.3s ease;
-}
-
-.back-button:hover {
-    background-color: var(--primary-color);
-}
+.crystal-page-container { width: 100%; max-width: 1400px; animation: fadeIn 0.5s ease-in-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.crystal-page-layout { display: flex; flex-wrap: wrap; gap: 30px; width: 100%; height: 75vh; }
+.crystal-summary-sidebar { flex: 1; min-width: 300px; padding: 30px; display: flex; flex-direction: column; align-items: center; text-align: center; overflow-y: auto; }
+.summary-image { width: 200px; height: 200px; object-fit: cover; border-radius: 50%; margin-bottom: 20px; border: 5px solid; box-shadow: 0 0 25px rgba(255,255,255,0.1); }
+.summary-title { font-size: 2.8rem; margin-bottom: 15px; font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.4); }
+.summary-text { font-size: 1.1rem; line-height: 1.7; color: var(--font-color-muted); }
+.journal-area { flex: 1; min-width: 300px; display: flex; flex-direction: column; }
+.journal-textarea { width: 100%; height: 100%; padding: 25px; color: var(--font-color); font-family: 'Poppins', sans-serif; font-size: 1.1rem; line-height: 1.6; resize: none; border: none; background: transparent; }
+.journal-textarea:focus { outline: 2px solid var(--primary-accent); box-shadow: 0 0 20px rgba(233, 69, 96, 0.3); }
+.journal-textarea::placeholder { color: var(--font-color-muted); }
+.journal-login-prompt { display: flex; align-items: center; justify-content: center; text-align: center; height: 100%; flex-direction: column; gap: 15px; }
+.back-button { display: inline-block; margin-bottom: 25px; font-size: 1rem; text-decoration: none; color: var(--font-color); padding: 10px 20px; cursor: pointer; transition: all 0.3s ease; }
+.back-button:hover { background-color: var(--primary-accent); transform: translateX(-5px); }

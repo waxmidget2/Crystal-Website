@@ -6,16 +6,11 @@ export default function Navbar() {
   const [user] = useAuthState(auth);
 
   return (
-    <nav className="navbar">
-      {user ? (
-        <button className="auth-button" onClick={logout}>
-          Logout
-        </button>
-      ) : (
-        <button className="auth-button" onClick={signInWithGoogle}>
-          Sign In with Google
-        </button>
-      )}
+    <nav className="navbar glass-ui">
+      <h1 className="navbar-title">Crystal Journal</h1>
+      <button className="action-button primary" onClick={user ? logout : signInWithGoogle}>
+        {user ? 'Sign Out' : 'Sign In with Google'}
+      </button>
     </nav>
   );
 }

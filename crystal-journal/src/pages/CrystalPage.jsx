@@ -3,8 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import Loader from '../components/Loader';
 import { debounce } from 'lodash';
+import Loader from '../components/Loader';
 
 export default function CrystalPage() {
   const { crystalId } = useParams();
@@ -13,36 +13,43 @@ export default function CrystalPage() {
   const [note, setNote] = useState('');
   const [loading, setLoading] = useState(true);
 
-  // Debounced save function to avoid too many Firestore writes
+  // Debounced save function
   const debouncedSave = useCallback(
     debounce(async (newNote) => {
-      if (user) {
-        const noteRef = doc(db, 'users', user.uid, 'notes', crystalId);
+      if (user && crystal) {
+        const noteRef = doc(db, 'users', user.uid, 'notes', crystal.id);
         await setDoc(noteRef, { content: newNote, lastUpdated: serverTimestamp() }, { merge: true });
       }
-    }, 1000), // Save 1 second after user stops typing
-    [user, crystalId]
+    }, 1000),
+    [user, crystal]
   );
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      // Fetch crystal summary
-      const crystalRef = doc(db, 'crystals', crystalId);
-      const crystalSnap = await getDoc(crystalRef);
-      if (crystalSnap.exists()) {
-        setCrystal(crystalSnap.data());
-      }
-
-      // Fetch user's note for this crystal
-      if (user) {
-        const noteRef = doc(db, 'users', user.uid, 'notes', crystalId);
-        const noteSnap = await getDoc(noteRef);
-        if (noteSnap.exists()) {
-          setNote(noteSnap.data().content);
+      try {
+        // Fetch crystal summary
+        const crystalRef = doc(db, 'crystals', crystalId);
+        const crystalSnap = await getDoc(crystalRef);
+        if (crystalSnap.exists()) {
+          setCrystal({ id: crystalSnap.id, ...crystalSnap.data() });
         }
+
+        // Fetch user's note for this crystal
+        if (user) {
+          const noteRef = doc(db, 'users', user.uid, 'notes', crystalId);
+          const noteSnap = await getDoc(noteRef);
+          if (noteSnap.exists()) {
+            setNote(noteSnap.data().content);
+          } else {
+            setNote('');
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchData();
@@ -52,37 +59,34 @@ export default function CrystalPage() {
     setNote(e.target.value);
     debouncedSave(e.target.value);
   };
-  
-  // You need to install lodash for debounce: npm install lodash
 
   if (loading) return <Loader />;
-  if (!crystal) return <div>Crystal not found. <Link to="/">Go Home</Link></div>;
+  if (!crystal) return <div><h2>Crystal not found.</h2><Link to="/">Go Home</Link></div>;
 
   return (
-    <>
-      <Link to="/" className="back-button">← Back to All Crystals</Link>
+    <div className="crystal-page-container">
+      <Link to="/" className="back-button glass-ui">← Back to All Crystals</Link>
       <div className="crystal-page-layout">
-        <aside className="crystal-summary-sidebar">
-          <img src={crystal.image} alt={crystal.name} className="summary-image" style={{ borderColor: crystal.color }} />
+        <aside className="crystal-summary-sidebar glass-ui">
+          <img src={crystal.image} alt={crystal.name} className="summary-image" style={{ borderColor: crystal.color }} onError={(e) => { e.target.src='https://placehold.co/200/1a1a2e/f0f0f0?text=Crystal'; }} />
           <h1 className="summary-title" style={{ color: crystal.color }}>{crystal.name}</h1>
           <p className="summary-text">{crystal.summary}</p>
         </aside>
-        <main className="journal-area">
+        <main className="journal-area glass-ui">
           {user ? (
             <textarea
               className="journal-textarea"
               value={note}
               onChange={handleNoteChange}
-              placeholder={`My personal thoughts & feelings about ${crystal.name}...`}
-              style={{ '::placeholder': { color: '#ffffff50' } }}
+              placeholder={`My personal notes on ${crystal.name}...`}
             />
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-              <h2>Please sign in to keep a journal.</h2>
+            <div className="journal-login-prompt">
+              <h2>Sign in to keep a journal.</h2>
             </div>
           )}
         </main>
       </div>
-    </>
+    </div>
   );
 }
