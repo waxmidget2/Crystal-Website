@@ -70,7 +70,7 @@ export default function JournalPage({ user }) {
       
       <Link to="/" className="back-to-journals-link">← Back to All Journals</Link>
 
-      {showAddForm && <AddItemForm journalId={journalId} on-item-added={handleItemAdded} user={user} />}
+      {showAddForm && <AddItemForm journalId={journalId} onItemAdded={handleItemAdded} user={user} />}
 
       <div className="home-grid">
         {items.map(item => (

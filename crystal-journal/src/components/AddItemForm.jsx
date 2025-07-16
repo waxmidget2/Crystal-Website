@@ -44,7 +44,7 @@ export default function AddItemForm({ journalId, onItemAdded, user }) {
       
       await setDoc(newItemRef, newItemData);
       
-      on-item-added(newItemData);
+      onItemAdded(newItemData);
 
     } catch (err) {
       console.error("Error adding item:", err);
