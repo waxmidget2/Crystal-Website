@@ -62,7 +62,7 @@ export default function JournalListPage({ user }) {
           type="text"
           value={newJournalName}
           onChange={(e) => setNewJournalName(e.target.value)}
-          placeholder="New journal name (e.g., Tarot Cards)"
+          placeholder="New journal name (e.g., Crystal Journal)"
         />
         <button type="submit" className="action-button secondary">＋ Create</button>
       </form>
