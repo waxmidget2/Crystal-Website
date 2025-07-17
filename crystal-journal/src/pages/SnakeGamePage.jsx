@@ -32,7 +32,7 @@ export default function SnakeGamePage({ user }) {
   return <GameCanvas user={user} gameId={currentGameId} isSpectator={isSpectator} onExitGame={handleExitGame} />;
 }
 
-// --- Game Lobby Component ---
+// --- Game Lobby Component (No changes needed here) ---
 function GameLobby({ user, onJoinGame, onSpectateGame }) {
   const [waitingGames, setWaitingGames] = useState([]);
   const [activeGames, setActiveGames] = useState([]);
@@ -42,14 +42,35 @@ function GameLobby({ user, onJoinGame, onSpectateGame }) {
     const lobbyRef = collection(db, 'snake-game-lobby');
     const gamesRef = collection(db, 'snake-games');
 
+    const cleanupStaleLobbies = async () => {
+      const tenMinutesAgo = Timestamp.fromMillis(Date.now() - 10 * 60 * 1000);
+      const oldLobbiesQuery = query(lobbyRef, where("createdAt", "<", tenMinutesAgo));
+      const oldLobbiesSnapshot = await getDocs(oldLobbiesQuery);
+      const batch = writeBatch(db);
+      oldLobbiesSnapshot.forEach(doc => batch.delete(doc.ref));
+      await batch.commit();
+    };
+
+    const cleanupFinishedGames = async () => {
+      const fiveMinutesAgo = Timestamp.fromMillis(Date.now() - 5 * 60 * 1000);
+      const oldGamesQuery = query(gamesRef, where("gameState", "==", "finished"), where("finishedAt", "<", fiveMinutesAgo));
+      const oldGamesSnapshot = await getDocs(oldGamesQuery);
+      const batch = writeBatch(db);
+      oldGamesSnapshot.forEach(doc => batch.delete(doc.ref));
+      await batch.commit();
+    };
+
+    cleanupStaleLobbies();
+    cleanupFinishedGames();
+
     const unsubscribeLobby = onSnapshot(lobbyRef, (snapshot) => {
       const availableGames = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setWaitingGames(availableGames);
       setLoading(false);
     });
 
-    const q = query(gamesRef, where("gameState", "in", ["active", "single-player"]));
-    const unsubscribeActive = onSnapshot(q, (snapshot) => {
+    const activeGamesQuery = query(gamesRef, where("gameState", "==", "active"));
+    const unsubscribeActive = onSnapshot(activeGamesQuery, (snapshot) => {
         const spectateGames = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setActiveGames(spectateGames);
     });
@@ -117,7 +138,6 @@ function GameLobby({ user, onJoinGame, onSpectateGame }) {
         <button onClick={() => createGame('single-player')} className="action-button secondary">Start Single Player</button>
         <button onClick={() => createGame('two-player')} className="action-button primary">Create 2-Player Game</button>
       </div>
-
       <div className="lobby-section">
         <h2>Join a Game</h2>
         <div className="journal-grid">
@@ -130,7 +150,6 @@ function GameLobby({ user, onJoinGame, onSpectateGame }) {
           )) : <p>No available games to join. Create one!</p>}
         </div>
       </div>
-
       <div className="lobby-section">
         <h2>Spectate a Game</h2>
         <div className="journal-grid">
@@ -152,10 +171,11 @@ function GameCanvas({ user, gameId, isSpectator, onExitGame }) {
   const canvasRef = useRef(null);
   const gameStateRef = useRef(null);
 
-  // --- INPUT HANDLING (THE FIX) ---
-  // This effect now sends the player's direction directly to Firestore.
+  // --- INPUT HANDLING ---
+  // This effect runs for PLAYERS ONLY (not spectators).
+  // It sends the player's intended direction to Firestore.
   useEffect(() => {
-    if (isSpectator) return; // Spectators don't send input.
+    if (isSpectator) return;
 
     const handleKeyDown = (e) => {
       const mySnake = gameStateRef.current?.snakes?.[user.uid];
@@ -170,21 +190,18 @@ function GameCanvas({ user, gameId, isSpectator, onExitGame }) {
         default: break;
       }
 
-      // If a valid new direction was chosen, update it in Firestore.
       if (newDir) {
         const gameRef = doc(db, 'snake-games', gameId);
-        updateDoc(gameRef, {
-          [`snakes.${user.uid}.dir`]: newDir
-        });
+        updateDoc(gameRef, { [`snakes.${user.uid}.dir`]: newDir });
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [user.uid, gameId, isSpectator]);
 
-  // --- GAME LOOP (THE FIX) ---
-  // The game loop (which only runs for the host) now reads directions for ALL snakes
-  // from the central Firestore state.
+  // --- GAME LOOP ---
+  // This effect runs the main game logic.
+  // CRITICAL FIX: It now ONLY runs if the current user is the host.
   useEffect(() => {
     let gameInterval;
     
@@ -194,10 +211,14 @@ function GameCanvas({ user, gameId, isSpectator, onExitGame }) {
       if (!gameSnap.exists()) return;
 
       const gameState = gameSnap.data();
+      
+      // --- HOST AUTHORITY CHECK ---
+      // Only the host (players[0]) or a single player can run the game logic.
       const isHost = gameState.players?.[0] === user.uid;
+      const isSinglePlayer = gameState.gameState === 'single-player';
 
-      if ((isHost && gameState.gameState === 'active') || gameState.gameState === 'single-player') {
-        if (gameState.winner) return;
+      if (isHost || isSinglePlayer) {
+        if (gameState.winner) return; // Stop if there's already a winner
 
         const newSnakes = { ...gameState.snakes };
         let newFood = { ...gameState.food };
@@ -232,7 +253,7 @@ function GameCanvas({ user, gameId, isSpectator, onExitGame }) {
         }
         
         if (winner) {
-          updateDoc(gameRef, { winner, gameState: 'finished' });
+          updateDoc(gameRef, { winner, gameState: 'finished', finishedAt: serverTimestamp() });
         } else {
           updateDoc(gameRef, { snakes: newSnakes, food: newFood });
         }
@@ -245,7 +266,8 @@ function GameCanvas({ user, gameId, isSpectator, onExitGame }) {
 
 
   // --- DRAWING LOOP ---
-  // This effect listens for game state changes and draws the canvas for everyone.
+  // This effect runs for EVERYONE (players and spectators).
+  // It just listens for data and draws what it receives.
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
