@@ -1,80 +1,107 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* src/index.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
+
+:root {
+    --bg-color: #2c2a4a;
+    --primary-accent: #ff79c6;
+    --secondary-accent: #8be9fd;
+    --tertiary-accent: #50fa7b;
+    --glass-bg: rgba(40, 42, 54, 0.75); /* Darker, more solid glass */
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --font-color: #f8f8f2;
+    --font-color-muted: #bd93f9;
+    --border-radius-main: 20px;
+    --backdrop-blur: 10px; /* Slightly less blur */
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+/* --- Rainbow Dash Mode! --- */
+.rainbow-dash-mode {
+    --primary-accent: #ff5555;
+    --secondary-accent: #ffb86c;
+    --tertiary-accent: #f1fa8c;
+    --font-color-muted: #50fa7b;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.rainbow-dash-mode .navbar-title { animation: rainbow-text 3s infinite linear; }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Nunito', sans-serif;
+    background-color: #000; /* Fallback background */
+    color: var(--font-color);
+    overflow-x: hidden;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.App {
+    width: 100vw;
+    min-height: 100vh;
+    padding: 5vh 5vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 1;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+/* --- Dynamic Background --- */
+.background-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
 }
 
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-}
-
-/* Add these styles to the bottom of src/index.css */
-
+/* --- Theme Designer FIX --- */
 .theme-designer-overlay {
   position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
   background-color: rgba(0, 0, 0, 0.6); z-index: 99;
   display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(5px);
 }
 .theme-designer-panel {
   width: 100%; max-width: 450px; padding: 30px;
   display: flex; flex-direction: column; gap: 15px;
+  /* This ensures the panel is visible over the black overlay */
+  background-color: var(--bg-color); 
 }
-.theme-designer-panel h2 { text-align: center; margin-bottom: 10px; }
-.theme-select {
-  width: 100%; padding: 10px; background-color: rgba(0,0,0,0.2);
-  border: 1px solid var(--glass-border); border-radius: 10px;
-  color: var(--font-color); font-size: 1rem;
+
+/* --- Tank Game Lobby FIX --- */
+.journal-card button {
+    position: relative; /* Ensures the button is on top of its parent */
+    z-index: 2;
 }
-.theme-color-palette {
-  display: flex; justify-content: space-around; align-items: center;
-}
-.theme-color-palette input[type="color"] {
-  -webkit-appearance: none; -moz-appearance: none; appearance: none;
-  width: 60px; height: 60px; background-color: transparent;
-  border: none; cursor: pointer;
-}
-.theme-color-palette input[type="color"]::-webkit-color-swatch {
-  border-radius: 50%; border: 3px solid var(--glass-border);
-}
-.theme-color-palette input[type="color"]::-moz-color-swatch {
-  border-radius: 50%; border: 3px solid var(--glass-border);
-}
-.theme-designer-buttons {
-    display: flex; justify-content: space-between; margin-top: 20px;
-}
-input[type="range"] {
-  width: 100%;
-}
+
+/* --- Other Styles (unchanged but included for completeness) --- */
+@keyframes rainbow-text { 0% { color: #ff5555; } 17% { color: #ffb86c; } 34% { color: #f1fa8c; } 51% { color: #50fa7b; } 68% { color: #8be9fd; } 85% { color: #bd93f9; } 100% { color: #ff79c6; } }
+.glass-ui { background: var(--glass-bg); border: 2px solid var(--glass-border); border-radius: var(--border-radius-main); backdrop-filter: blur(var(--backdrop-blur)); -webkit-backdrop-filter: blur(var(--backdrop-blur)); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); transition: border-color 0.3s ease; }
+.glass-ui:hover { border-color: var(--primary-accent); }
+.action-button { padding: 12px 28px; font-size: 1rem; font-weight: 700; color: var(--font-color); border: none; border-radius: var(--border-radius-main); cursor: pointer; transition: all 0.3s ease; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+.action-button.primary { background-color: var(--primary-accent); }
+.action-button.secondary { background-color: var(--secondary-accent); }
+.action-button:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 20px rgba(0,0,0, 0.3); }
+.action-button:disabled { background-color: #555; cursor: not-allowed; }
+.navbar { width: 100%; max-width: 1200px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding: 10px 20px; }
+.nav-left-group { display: flex; align-items: center; gap: 10px; }
+.navbar-title { font-size: 1.8rem; font-weight: 700; }
+.nav-button { background: none; border: none; font-size: 1.8rem; cursor: pointer; padding: 0 5px; transition: transform 0.3s ease-in-out; display: inline-block; }
+.nav-button:hover { transform: scale(1.2) rotate(15deg); }
+.login-prompt { text-align: center; padding: 50px; }
+.journal-list-container { width: 100%; max-width: 900px; text-align: center; }
+.add-journal-form { display: flex; gap: 15px; padding: 20px; margin: 20px 0 40px 0; }
+.add-journal-form input { flex-grow: 1; padding: 12px; font-size: 1.1rem; background-color: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 10px; color: var(--font-color); }
+.add-journal-form input:focus { outline: 2px solid var(--secondary-accent); }
+.journal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+.journal-card { padding: 40px 20px; text-decoration: none; color: var(--font-color); transition: all 0.3s ease; }
+.journal-card:hover { transform: translateY(-5px); border-color: var(--secondary-accent); background: rgba(139, 233, 253, 0.1); }
+.back-to-journals-link { display: inline-block; margin-bottom: 20px; text-decoration: none; color: var(--font-color-muted); }
+.theme-select { width: 100%; padding: 10px; background-color: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 10px; color: var(--font-color); font-size: 1rem; }
+.theme-color-palette { display: flex; justify-content: space-around; align-items: center; }
+.theme-color-palette input[type="color"] { -webkit-appearance: none; -moz-appearance: none; appearance: none; width: 60px; height: 60px; background-color: transparent; border: none; cursor: pointer; }
+.theme-color-palette input[type="color"]::-webkit-color-swatch { border-radius: 50%; border: 3px solid var(--glass-border); }
+.theme-color-palette input[type="color"]::-moz-color-swatch { border-radius: 50%; border: 3px solid var(--glass-border); }
+.theme-designer-buttons { display: flex; justify-content: space-between; margin-top: 20px; }
+input[type="range"] { width: 100%; }
+.footer { margin-top: 40px; color: var(--font-color-muted); opacity: 0.7; }

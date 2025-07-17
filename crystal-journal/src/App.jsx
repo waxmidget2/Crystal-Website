@@ -29,8 +29,13 @@ function App() {
   const [user, loading] = useAuthState(auth);
   const [themeParams, setThemeParams] = useState(defaultThemeParams);
   const [showThemeDesigner, setShowThemeDesigner] = useState(false);
+  const [isRainbowMode, setIsRainbowMode] = useState(false); // <-- RAINBOW MODE STATE IS BACK
 
-  // Load user's theme from Firestore when they log in
+  // Function to toggle Rainbow Dash mode
+  const toggleRainbowMode = () => {
+    setIsRainbowMode(prevMode => !prevMode);
+  };
+
   useEffect(() => {
     const fetchTheme = async () => {
       if (user) {
@@ -81,8 +86,13 @@ function App() {
   return (
     <Router>
       <DynamicBackground themeParams={themeParams} />
-      <div className="App">
-        <Navbar user={user} onThemeClick={() => setShowThemeDesigner(true)} />
+      {/* The rainbow-dash-mode class is now correctly applied */}
+      <div className={`App ${isRainbowMode ? 'rainbow-dash-mode' : ''}`}>
+        <Navbar 
+          user={user} 
+          onThemeClick={() => setShowThemeDesigner(true)}
+          toggleRainbowMode={toggleRainbowMode} // Pass the function down
+        />
         <Routes>
           <Route path="/" element={<JournalListPage user={user} />} />
           <Route path="/journal/:journalId" element={<JournalPage user={user} />} />

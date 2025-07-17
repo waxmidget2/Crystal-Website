@@ -1,23 +1,27 @@
 // src/components/Navbar.jsx
 
 import React from 'react';
-import { Link } from 'react-router-dom'; // <-- IMPORT LINK
+import { Link } from 'react-router-dom';
 import { signInWithGoogle, logout } from '../firebase';
 
-export default function Navbar({ user, onThemeClick }) {
+export default function Navbar({ user, onThemeClick, toggleRainbowMode }) {
   return (
     <nav className="navbar glass-ui">
       <div className="nav-left-group">
-        {/* Link back to the main journal list */}
         <Link to="/" style={{textDecoration: 'none', color: 'inherit'}}>
             <h1 className="navbar-title">🔮 Multi-Journal</h1>
         </Link>
-        
-        {/* Link to the Tank Game */}
         <Link to="/tank-game" className="nav-button" title="Tank Game">
-            🛡️ Tank Game
+          坦克
         </Link>
-
+        {/* The Rainbow Dash button is back! */}
+        <button 
+          className="nav-button" 
+          onClick={toggleRainbowMode}
+          title="Toggle Rainbow Mode"
+        >
+          🌈
+        </button>
         {user && (
           <button
             className="nav-button"
