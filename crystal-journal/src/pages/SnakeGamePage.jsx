@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { db } from '../firebase';
-import { collection, addDoc, doc, onSnapshot, updateDoc, arrayUnion, deleteDoc, serverTimestamp, setDoc } from 'firebase/firestore';
+// Import Timestamp for time-based queries
+import { collection, addDoc, doc, onSnapshot, updateDoc, arrayUnion, deleteDoc, serverTimestamp, setDoc, query, where, Timestamp, writeBatch } from 'firebase/firestore';
 import Loader from '../components/Loader';
 
 // --- Game Constants ---
@@ -33,11 +34,41 @@ function GameLobby({ user, onJoinGame }) {
 
   useEffect(() => {
     const lobbyRef = collection(db, 'snake-game-lobby');
+
+    // --- NEW: Function to clean up stale games ---
+    const cleanupOldGames = async () => {
+      console.log("Checking for stale games...");
+      // Calculate the timestamp for 10 minutes ago
+      const tenMinutesAgo = Timestamp.fromMillis(Date.now() - 10 * 60 * 1000);
+      
+      // Create a query for games older than 10 minutes
+      const oldGamesQuery = query(lobbyRef, where("createdAt", "<", tenMinutesAgo));
+      
+      const oldGamesSnapshot = await getDocs(oldGamesQuery);
+      if (oldGamesSnapshot.empty) {
+        console.log("No stale games found.");
+        return;
+      }
+
+      // Use a batch to delete all stale games in one operation
+      const batch = writeBatch(db);
+      oldGamesSnapshot.forEach(doc => {
+        console.log(`Deleting stale game: ${doc.id}`);
+        batch.delete(doc.ref);
+      });
+      await batch.commit();
+    };
+    
+    // Run the cleanup when the lobby loads
+    cleanupOldGames();
+
+    // Set up the real-time listener for active games
     const unsubscribe = onSnapshot(lobbyRef, (snapshot) => {
       const availableGames = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setGames(availableGames);
       setLoading(false);
     });
+
     return unsubscribe;
   }, []);
 
@@ -57,7 +88,6 @@ function GameLobby({ user, onJoinGame }) {
         [user.uid]: { name: user.displayName || "Player 1", color: '#8be9fd' }
       },
       gameState: 'waiting',
-      // Initial snake positions and food
       snakes: {
         [user.uid]: {
           body: [{ x: 5, y: 5 }],
@@ -106,13 +136,12 @@ function GameLobby({ user, onJoinGame }) {
   );
 }
 
-// --- Game Canvas and Logic Component ---
+// --- Game Canvas and Logic Component (No changes needed here) ---
 function GameCanvas({ user, gameId, onExitGame }) {
   const canvasRef = useRef(null);
   const gameStateRef = useRef(null);
   const playerDirectionRef = useRef({ x: 0, y: 0 });
 
-  // This effect listens for keyboard input to change direction
   useEffect(() => {
     const handleKeyDown = (e) => {
       const mySnake = gameStateRef.current?.snakes?.[user.uid];
@@ -132,7 +161,6 @@ function GameCanvas({ user, gameId, onExitGame }) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [user.uid]);
 
-  // This is the main game loop, running on the host's machine
   useEffect(() => {
     let gameInterval;
     const isHost = gameStateRef.current?.players?.[0] === user.uid;
@@ -147,25 +175,21 @@ function GameCanvas({ user, gameId, onExitGame }) {
         let newFood = { ...gameState.food };
         let winner = null;
 
-        // Update my snake's direction from the ref
         newSnakes[user.uid].dir = playerDirectionRef.current;
         
         const allSnakeSegments = [];
         Object.values(newSnakes).forEach(s => allSnakeSegments.push(...s.body));
 
-        // Move snakes and check for collisions
         for (const playerId in newSnakes) {
           const snake = newSnakes[playerId];
           const head = { ...snake.body[0] };
           head.x += snake.dir.x;
           head.y += snake.dir.y;
 
-          // Check wall collision
           if (head.x < 0 || head.x >= CANVAS_WIDTH / GRID_SIZE || head.y < 0 || head.y >= CANVAS_HEIGHT / GRID_SIZE) {
             winner = gameState.players.find(p => p !== playerId);
           }
 
-          // Check self and other snake collision
           for (const segment of allSnakeSegments) {
             if (head.x === segment.x && head.y === segment.y) {
               winner = gameState.players.find(p => p !== playerId);
@@ -174,9 +198,7 @@ function GameCanvas({ user, gameId, onExitGame }) {
 
           snake.body.unshift(head);
 
-          // Check food collision
           if (head.x === newFood.x && head.y === newFood.y) {
-            // Respawn food
             newFood = {
               x: Math.floor(Math.random() * (CANVAS_WIDTH / GRID_SIZE)),
               y: Math.floor(Math.random() * (CANVAS_HEIGHT / GRID_SIZE)),
@@ -195,7 +217,6 @@ function GameCanvas({ user, gameId, onExitGame }) {
   }, [user.uid, gameId]);
 
 
-  // This effect listens for game state changes from Firestore and draws the canvas
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -213,21 +234,17 @@ function GameCanvas({ user, gameId, onExitGame }) {
       gameStateRef.current = doc.data();
       const { snakes, food, playerData } = gameStateRef.current;
       
-      // Initialize my direction if it's the first render
       if (snakes?.[user.uid] && playerDirectionRef.current.x === 0 && playerDirectionRef.current.y === 0) {
           playerDirectionRef.current = snakes[user.uid].dir;
       }
 
-      // Draw the game
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = 'rgba(0,0,0,0.3)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Draw food
       ctx.fillStyle = 'yellow';
       ctx.fillRect(food.x * GRID_SIZE, food.y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
 
-      // Draw snakes
       for (const playerId in snakes) {
         const snake = snakes[playerId];
         ctx.fillStyle = playerData[playerId].color;

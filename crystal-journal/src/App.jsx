@@ -54,7 +54,6 @@ function App() {
           {/* Route now points to the new Snake Game */}
           <Route path="/snake-game" element={<SnakeGamePage user={user} />} />
         </Routes>
-        <footer className="footer">Create your own magic!</footer>
       </div>
     </Router>
   );
