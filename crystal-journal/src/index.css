@@ -27,7 +27,7 @@
 
 body {
     font-family: 'Nunito', sans-serif;
-    background-color: var(--bg-color); /* The background is now controlled by this variable */
+    background-color: var(--bg-color);
     color: var(--font-color);
     overflow-x: hidden;
     transition: background-color 0.5s ease;
@@ -73,7 +73,6 @@ body {
     background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
     overflow: hidden;
 }
-/* This requires pseudo-elements for the stars */
 .bg-galaxy:after, .bg-galaxy:before {
     content: '';
     position: absolute;
@@ -113,7 +112,6 @@ body {
 
 .bg-synthwave {
     background: linear-gradient(to top, #232526, #414345);
-    /* Add grid lines */
     background-image: 
         linear-gradient(rgba(233, 69, 96, 0.5) 2px, transparent 2px),
         linear-gradient(90deg, rgba(233, 69, 96, 0.5) 2px, transparent 2px);
@@ -141,8 +139,9 @@ body {
     100% { background-position: 0% 50%; }
 }
 
-/* --- Other Styles (mostly unchanged) --- */
 @keyframes rainbow-text { 0% { color: #ff5555; } 17% { color: #ffb86c; } 34% { color: #f1fa8c; } 51% { color: #50fa7b; } 68% { color: #8be9fd; } 85% { color: #bd93f9; } 100% { color: #ff79c6; } }
+
+/* --- Shared UI Components --- */
 .glass-ui { background: var(--glass-bg); border: 2px solid var(--glass-border); border-radius: var(--border-radius-main); backdrop-filter: blur(var(--backdrop-blur)); -webkit-backdrop-filter: blur(var(--backdrop-blur)); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); transition: all 0.3s ease; }
 .glass-ui:hover { border-color: var(--primary-accent); }
 .action-button { padding: 12px 28px; font-size: 1rem; font-weight: 700; color: var(--font-color); border: none; border-radius: var(--border-radius-main); cursor: pointer; transition: all 0.3s ease; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
@@ -150,54 +149,110 @@ body {
 .action-button.secondary { background-color: var(--secondary-accent); }
 .action-button:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 20px rgba(0,0,0, 0.3); }
 .action-button:disabled { background-color: #555; cursor: not-allowed; }
+
+/* --- Navbar --- */
 .navbar { width: 100%; max-width: 1200px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding: 10px 20px; }
 .nav-left-group { display: flex; align-items: center; gap: 10px; }
 .navbar-title { font-size: 1.8rem; font-weight: 700; }
 .nav-button { background: none; border: none; font-size: 1.8rem; cursor: pointer; padding: 0 5px; transition: transform 0.3s ease-in-out; display: inline-block; }
 .nav-button:hover { transform: scale(1.2) rotate(15deg); }
+
+/* --- Journal & Item Pages --- */
 .login-prompt { text-align: center; padding: 50px; }
+.page-content-container { width: 100%; max-width: 1200px; display: flex; flex-direction: column; align-items: center; }
+.journal-page-header { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid var(--glass-border); gap: 20px; }
+.journal-title-section h1 { margin: 0; font-size: 2.5rem; color: var(--font-color); }
+.back-to-journals-link { margin: 0; text-decoration: none; color: var(--font-color-muted); transition: color 0.2s ease; }
+.back-to-journals-link:hover { color: var(--secondary-accent); }
+
+/* --- Grids (Journals and Items) --- */
 .journal-list-container { width: 100%; max-width: 900px; text-align: center; }
-.add-journal-form { display: flex; gap: 15px; padding: 20px; margin: 20px 0 40px 0; }
-.add-journal-form input { flex-grow: 1; padding: 12px; font-size: 1.1rem; background-color: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 10px; color: var(--font-color); }
-.add-journal-form input:focus { outline: 2px solid var(--secondary-accent); }
+.home-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 30px; width: 100%; max-width: 1200px; }
 .journal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+
+/* --- Bubbly & Clean Item Card (Final Corrected Version) --- */
+.crystal-button {
+  position: relative;
+  height: 280px;
+  border-radius: var(--border-radius-main);
+  overflow: hidden; /* Clips the image corners */
+  cursor: pointer;
+  transition: all 0.4s ease;
+  background-color: var(--glass-bg);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  border: 2px solid transparent;
+}
+.crystal-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  border-color: var(--secondary-accent);
+}
+.crystal-link {
+  color: white;
+  text-decoration: none;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.crystal-button img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures image covers the area without stretching */
+  transition: transform 0.4s ease;
+  background-color: rgba(0, 0, 0, 0.3); /* Dark backdrop for transparent PNGs */
+}
+.crystal-button:hover img {
+  transform: scale(1.1);
+}
+.crystal-button-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 20px 15px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: white;
+  background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+}
+
+/* --- Journal Card (Lobby & List) --- */
 .journal-card { padding: 40px 20px; text-decoration: none; color: var(--font-color); transition: all 0.3s ease; }
 .journal-card:hover { transform: translateY(-5px); border-color: var(--secondary-accent); background: rgba(139, 233, 253, 0.1); }
 .journal-card button { position: relative; z-index: 2; }
+
+/* --- Forms & Modals --- */
+.add-journal-form { display: flex; gap: 15px; padding: 20px; margin: 20px 0 40px 0; }
+.add-journal-form input { flex-grow: 1; padding: 12px; font-size: 1.1rem; background-color: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 10px; color: var(--font-color); }
+.add-journal-form input:focus { outline: 2px solid var(--secondary-accent); }
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.7); z-index: 100; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+.modal-content { display: flex; flex-direction: column; align-items: center; }
+.add-crystal-form { padding: 30px; margin-bottom: 0; width: 100%; max-width: 600px; display: flex; flex-direction: column; gap: 20px; animation: fadeIn 0.5s ease-in-out; }
+.form-title { text-align: center; margin-bottom: 10px; }
+.form-group { display: flex; flex-direction: column; gap: 8px; }
+.form-group label { font-weight: 600; color: var(--font-color-muted); }
+.form-group input, .form-group textarea { width: 100%; padding: 12px; font-size: 1rem; background-color: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 10px; color: var(--font-color); }
+.form-group input:focus, .form-group textarea:focus { outline: 2px solid var(--primary-accent); }
+.form-group textarea { resize: vertical; min-height: 100px; }
+.form-group input[type="file"] { padding: 5px; }
+.form-group input[type="file"]::file-selector-button { padding: 8px 15px; border: none; border-radius: 8px; background-color: var(--secondary-accent); color: white; cursor: pointer; transition: background-color 0.2s; }
+.form-group input[type="file"]::file-selector-button:hover { background-color: #3a80d2; }
+.form-error { color: var(--primary-accent); text-align: center; }
+
+/* --- Misc & Page-Specific --- */
 .footer { margin-top: 40px; color: var(--font-color-muted); opacity: 0.7; }
-/* Add these styles to the bottom of src/index.css */
-
-.journal-page-header {
-  width: 100%;
-  max-width: 1200px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--glass-border);
-  gap: 20px;
-}
-
-.journal-title-section h1 {
-  margin: 0;
-  font-size: 2.5rem;
-  color: var(--font-color);
-}
-
-.back-to-journals-link {
-  margin: 0; /* Resets previous margin */
-  text-decoration: none;
-  color: var(--font-color-muted);
-  transition: color 0.2s ease;
-}
-
-.back-to-journals-link:hover {
-  color: var(--secondary-accent);
-}
-
-/* --- Item Card Image FIX --- */
-/* This gives a dark backdrop to transparent images */
-.crystal-button img {
-  background-color: rgba(0, 0, 0, 0.2);
-}
+.delete-button { position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; background-color: rgba(233, 69, 96, 0.8); color: white; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: bold; z-index: 10; transition: all 0.2s ease; opacity: 0; }
+.crystal-button:hover .delete-button { opacity: 1; }
+.delete-button:hover { background-color: #e94560; transform: scale(1.1); }
+.delete-button:active { transform: scale(0.9); }
+.delete-button:focus { outline: none; box-shadow: 0 0 0 2px var(--primary-accent); }
+.delete-button svg { width: 16px; height: 16px; fill: white ; }
+.delete-button svg:hover { fill: var(--secondary-accent); }
+.crystal-button:hover .crystal-button-label { transform: translateY(-20px); opacity: 0.8; }
+.crystal-button-label:hover { transform: translateY(-10px); opacity: 1; }
+.crystal-button-label:focus { outline: none; box-shadow: 0 0 0 2px var(--primary-accent); }
+.crystal-button-label:hover { text-decoration: underline; }
