@@ -1,6 +1,6 @@
 // src/pages/ItemPage.jsx
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react'; // <-- Add useMemo
 import { useParams, Link } from 'react-router-dom';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -12,6 +12,11 @@ export default function ItemPage({ user }) {
   const [item, setItem] = useState(null);
   const [note, setNote] = useState('');
   const [loading, setLoading] = useState(true);
+
+  // --- NEW: 20% Cooler Easter Egg ---
+  const isCooler = useMemo(() => {
+    return note.toLowerCase().includes('20% cooler');
+  }, [note]);
 
   const debouncedSave = useCallback(
     debounce(async (newNote) => {
@@ -27,12 +32,10 @@ export default function ItemPage({ user }) {
     if (user && journalId && itemId) {
       const fetchData = async () => {
         setLoading(true);
-        // Fetch item data
         const itemRef = doc(db, 'users', user.uid, 'journals', journalId, 'items', itemId);
         const itemSnap = await getDoc(itemRef);
         if (itemSnap.exists()) setItem({ id: itemSnap.id, ...itemSnap.data() });
 
-        // Fetch note data
         const noteRef = doc(db, 'users', user.uid, 'journals', journalId, 'notes', itemId);
         const noteSnap = await getDoc(noteRef);
         if (noteSnap.exists()) setNote(noteSnap.data().content);
@@ -62,7 +65,7 @@ export default function ItemPage({ user }) {
         </aside>
         <main className="journal-area glass-ui">
           <textarea
-            className="journal-textarea"
+            className={`journal-textarea ${isCooler ? 'twenty-percent-cooler' : ''}`} // <-- Apply class
             value={note}
             onChange={handleNoteChange}
             placeholder={`My personal thoughts & feelings about ${item.name}...`}

@@ -241,3 +241,50 @@ body {
   text-decoration: none;
   color: var(--font-color-muted);
 }
+/* Add these styles to the bottom of src/index.css */
+
+/* --- Tank Game Styles --- */
+.tank-game-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 400px;
+  max-width: 90vw;
+  z-index: 1000;
+  transition: all 0.3s ease-in-out;
+}
+
+.tank-game-canvas {
+  width: 100%;
+  height: 300px;
+  background-color: #333;
+  border-top-left-radius: var(--border-radius-main);
+  border-top-right-radius: var(--border-radius-main);
+}
+
+.tank-game-controls {
+  padding: 10px;
+  text-align: center;
+  border-bottom-left-radius: var(--border-radius-main);
+  border-bottom-right-radius: var(--border-radius-main);
+}
+
+.tank-game-controls p {
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.tank-game-controls .action-button {
+  padding: 8px 16px;
+}
+
+/* --- Secret Journal Easter Egg Style --- */
+.secret-journal-theme {
+  --bg-color: #1d1a30;
+  --primary-accent: #f1fa8c; /* Yellow */
+  --font-color-muted: #ffb86c; /* Orange */
+}
+
+.secret-journal-theme .navbar-title {
+  text-shadow: 0 0 10px var(--primary-accent);
+}

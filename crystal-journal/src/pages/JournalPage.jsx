@@ -73,19 +73,26 @@ export default function JournalPage({ user }) {
       {showAddForm && <AddItemForm journalId={journalId} onItemAdded={handleItemAdded} user={user} />}
 
       <div className="home-grid">
-        {items.map(item => (
-          <div key={item.id} className="crystal-button glass-ui">
-            <button
-              className="delete-button"
-              onClick={(e) => { e.preventDefault(); handleDelete(item.id, item.image); }}
-              title="Delete Item"
-            >&times;</button>
-            <Link to={`/journal/${journalId}/item/${item.id}`} className="crystal-link">
-              <img src={item.image} alt={item.name} onError={(e) => { e.target.src='https://placehold.co/400x600/1a1a2e/f0f0f0?text=Item'; }} />
-              <div className="crystal-button-label">{item.name}</div>
-            </Link>
-          </div>
-        ))}
+        {items.map(item => {
+          // --- NEW: Secret item easter egg ---
+          const isSecretItem = item.name.toLowerCase() === 'the tom-foolery';
+          const displayName = isSecretItem ? 'A Mysterious Item' : item.name;
+          const displayImage = isSecretItem ? 'https://placehold.co/400x600/2c2a4a/ff79c6?text=???' : item.image;
+
+          return (
+            <div key={item.id} className="crystal-button glass-ui">
+              <button
+                className="delete-button"
+                onClick={(e) => { e.preventDefault(); handleDelete(item.id, item.image); }}
+                title="Delete Item"
+              >&times;</button>
+              <Link to={`/journal/${journalId}/item/${item.id}`} className="crystal-link">
+                <img src={displayImage} alt={displayName} onError={(e) => { e.target.src='https://placehold.co/400x600/1a1a2e/f0f0f0?text=Item'; }} />
+                <div className="crystal-button-label">{displayName}</div>
+              </Link>
+            </div>
+          );
+        })}
         {items.length === 0 && !showAddForm && <p>This journal is empty. Add your first item!</p>}
       </div>
     </>
