@@ -70,7 +70,6 @@ function App() {
           {/* Pass the user object to the game page */}
           <Route path="/tank-game" element={<TankGamePage user={user} />} />
         </Routes>
-        <footer className="footer">Create your own magic!</footer>
       </div>
       {showThemeDesigner && (
         <ThemeDesigner
