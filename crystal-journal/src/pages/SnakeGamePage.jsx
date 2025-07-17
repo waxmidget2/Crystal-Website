@@ -170,10 +170,9 @@ function GameLobby({ user, onJoinGame, onSpectateGame }) {
 function GameCanvas({ user, gameId, isSpectator, onExitGame }) {
   const canvasRef = useRef(null);
   const gameStateRef = useRef(null);
-  const animationFrameId = useRef(null); // To control the drawing loop
+  const animationFrameId = useRef(null);
 
   // --- INPUT HANDLING ---
-  // This effect runs for PLAYERS ONLY.
   useEffect(() => {
     if (isSpectator) return;
 
@@ -200,21 +199,30 @@ function GameCanvas({ user, gameId, isSpectator, onExitGame }) {
   }, [user.uid, gameId, isSpectator]);
 
   // --- GAME LOGIC LOOP ---
-  // This effect runs the main game logic ONLY FOR THE HOST.
   useEffect(() => {
     let gameInterval;
     
     const runGameTick = async () => {
+      // Use a direct getDoc to ensure we have the absolute latest state for the check
       const gameRef = doc(db, 'snake-games', gameId);
       const gameSnap = await getDoc(gameRef);
-      if (!gameSnap.exists()) return;
+      if (!gameSnap.exists()) {
+        clearInterval(gameInterval);
+        return;
+      };
 
       const gameState = gameSnap.data();
+      
+      // --- HOST AUTHORITY CHECK ---
       const isHost = gameState.players?.[0] === user.uid;
       const isSinglePlayer = gameState.gameState === 'single-player';
 
+      // CRITICAL FIX: Only run the game logic if the current user is the host.
       if (isHost || isSinglePlayer) {
-        if (gameState.winner) return;
+        if (gameState.winner) {
+          clearInterval(gameInterval); // Stop the loop if there's a winner
+          return;
+        }
 
         const newSnakes = { ...gameState.snakes };
         let newFood = { ...gameState.food };
@@ -268,9 +276,7 @@ function GameCanvas({ user, gameId, isSpectator, onExitGame }) {
     canvas.width = CANVAS_WIDTH;
     canvas.height = CANVAS_HEIGHT;
 
-    // The drawing function, which will be called by requestAnimationFrame
     const draw = () => {
-        // Only draw if we have a game state to render
         if (gameStateRef.current) {
             const { snakes, food, playerData } = gameStateRef.current;
             
@@ -293,14 +299,11 @@ function GameCanvas({ user, gameId, isSpectator, onExitGame }) {
                 }
             }
         }
-        // Continue the loop
         animationFrameId.current = requestAnimationFrame(draw);
     };
 
-    // Start the drawing loop immediately
     draw();
     
-    // Firestore listener: its ONLY job is to update the gameStateRef
     const gameRef = doc(db, 'snake-games', gameId);
     const unsubscribe = onSnapshot(gameRef, (doc) => {
       if (!doc.exists()) {
@@ -311,7 +314,6 @@ function GameCanvas({ user, gameId, isSpectator, onExitGame }) {
       gameStateRef.current = doc.data();
     });
 
-    // Cleanup function
     return () => {
       unsubscribe();
       cancelAnimationFrame(animationFrameId.current);
