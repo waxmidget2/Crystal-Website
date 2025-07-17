@@ -32,7 +32,7 @@ export default function SnakeGamePage({ user }) {
   return <GameCanvas user={user} gameId={currentGameId} isSpectator={isSpectator} onExitGame={handleExitGame} />;
 }
 
-// --- Game Lobby Component (No changes needed here) ---
+// --- Game Lobby Component (No changes needed) ---
 function GameLobby({ user, onJoinGame, onSpectateGame }) {
   const [waitingGames, setWaitingGames] = useState([]);
   const [activeGames, setActiveGames] = useState([]);
@@ -170,10 +170,10 @@ function GameLobby({ user, onJoinGame, onSpectateGame }) {
 function GameCanvas({ user, gameId, isSpectator, onExitGame }) {
   const canvasRef = useRef(null);
   const gameStateRef = useRef(null);
+  const animationFrameId = useRef(null); // To control the drawing loop
 
   // --- INPUT HANDLING ---
-  // This effect runs for PLAYERS ONLY (not spectators).
-  // It sends the player's intended direction to Firestore.
+  // This effect runs for PLAYERS ONLY.
   useEffect(() => {
     if (isSpectator) return;
 
@@ -199,9 +199,8 @@ function GameCanvas({ user, gameId, isSpectator, onExitGame }) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [user.uid, gameId, isSpectator]);
 
-  // --- GAME LOOP ---
-  // This effect runs the main game logic.
-  // CRITICAL FIX: It now ONLY runs if the current user is the host.
+  // --- GAME LOGIC LOOP ---
+  // This effect runs the main game logic ONLY FOR THE HOST.
   useEffect(() => {
     let gameInterval;
     
@@ -211,14 +210,11 @@ function GameCanvas({ user, gameId, isSpectator, onExitGame }) {
       if (!gameSnap.exists()) return;
 
       const gameState = gameSnap.data();
-      
-      // --- HOST AUTHORITY CHECK ---
-      // Only the host (players[0]) or a single player can run the game logic.
       const isHost = gameState.players?.[0] === user.uid;
       const isSinglePlayer = gameState.gameState === 'single-player';
 
       if (isHost || isSinglePlayer) {
-        if (gameState.winner) return; // Stop if there's already a winner
+        if (gameState.winner) return;
 
         const newSnakes = { ...gameState.snakes };
         let newFood = { ...gameState.food };
@@ -265,15 +261,46 @@ function GameCanvas({ user, gameId, isSpectator, onExitGame }) {
   }, [user.uid, gameId]);
 
 
-  // --- DRAWING LOOP ---
-  // This effect runs for EVERYONE (players and spectators).
-  // It just listens for data and draws what it receives.
+  // --- DRAWING AND STATE SYNC ---
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     canvas.width = CANVAS_WIDTH;
     canvas.height = CANVAS_HEIGHT;
 
+    // The drawing function, which will be called by requestAnimationFrame
+    const draw = () => {
+        // Only draw if we have a game state to render
+        if (gameStateRef.current) {
+            const { snakes, food, playerData } = gameStateRef.current;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(0,0,0,0.3)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            if (food) {
+                ctx.fillStyle = 'yellow';
+                ctx.fillRect(food.x * GRID_SIZE, food.y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
+            }
+
+            if (snakes) {
+                for (const playerId in snakes) {
+                    const snake = snakes[playerId];
+                    ctx.fillStyle = playerData[playerId]?.color || '#ffffff';
+                    snake.body.forEach(segment => {
+                        ctx.fillRect(segment.x * GRID_SIZE, segment.y * GRID_SIZE, GRID_SIZE - 1, GRID_SIZE - 1);
+                    });
+                }
+            }
+        }
+        // Continue the loop
+        animationFrameId.current = requestAnimationFrame(draw);
+    };
+
+    // Start the drawing loop immediately
+    draw();
+    
+    // Firestore listener: its ONLY job is to update the gameStateRef
     const gameRef = doc(db, 'snake-games', gameId);
     const unsubscribe = onSnapshot(gameRef, (doc) => {
       if (!doc.exists()) {
@@ -281,31 +308,14 @@ function GameCanvas({ user, gameId, isSpectator, onExitGame }) {
         onExitGame();
         return;
       }
-      
       gameStateRef.current = doc.data();
-      const { snakes, food, playerData } = gameStateRef.current;
-      
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = 'rgba(0,0,0,0.3)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      if (food) {
-        ctx.fillStyle = 'yellow';
-        ctx.fillRect(food.x * GRID_SIZE, food.y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
-      }
-
-      if (snakes) {
-        for (const playerId in snakes) {
-          const snake = snakes[playerId];
-          ctx.fillStyle = playerData[playerId]?.color || '#ffffff';
-          snake.body.forEach(segment => {
-            ctx.fillRect(segment.x * GRID_SIZE, segment.y * GRID_SIZE, GRID_SIZE - 1, GRID_SIZE - 1);
-          });
-        }
-      }
     });
 
-    return unsubscribe;
+    // Cleanup function
+    return () => {
+      unsubscribe();
+      cancelAnimationFrame(animationFrameId.current);
+    };
   }, [gameId, onExitGame]);
 
   const gameData = gameStateRef.current;
