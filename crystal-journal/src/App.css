@@ -7,15 +7,14 @@
     --primary-accent: #ff79c6;
     --secondary-accent: #8be9fd;
     --tertiary-accent: #50fa7b;
-    --glass-bg: rgba(40, 42, 54, 0.75); /* Darker, more solid glass */
+    --glass-bg: rgba(40, 42, 54, 0.75);
     --glass-border: rgba(255, 255, 255, 0.2);
     --font-color: #f8f8f2;
     --font-color-muted: #bd93f9;
     --border-radius-main: 20px;
-    --backdrop-blur: 10px; /* Slightly less blur */
+    --backdrop-blur: 10px;
 }
 
-/* --- Rainbow Dash Mode! --- */
 .rainbow-dash-mode {
     --primary-accent: #ff5555;
     --secondary-accent: #ffb86c;
@@ -28,7 +27,7 @@
 
 body {
     font-family: 'Nunito', sans-serif;
-    background-color: #000; /* Fallback background */
+    background-color: #000;
     color: var(--font-color);
     overflow-x: hidden;
 }
@@ -44,7 +43,6 @@ body {
     z-index: 1;
 }
 
-/* --- Dynamic Background --- */
 .background-container {
     position: fixed;
     top: 0;
@@ -57,22 +55,32 @@ body {
 /* --- Theme Designer FIX --- */
 .theme-designer-overlay {
   position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-  background-color: rgba(0, 0, 0, 0.6); z-index: 99;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 99;
   display: flex; align-items: center; justify-content: center;
   backdrop-filter: blur(5px);
 }
 .theme-designer-panel {
   width: 100%; max-width: 450px; padding: 30px;
   display: flex; flex-direction: column; gap: 15px;
-  /* This ensures the panel is visible over the black overlay */
-  background-color: var(--bg-color); 
+  /* Use the glass-ui variables directly for a guaranteed visible panel */
+  background: var(--glass-bg);
+  border: 2px solid var(--glass-border);
+  border-radius: var(--border-radius-main);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
 }
+/* Explicitly set text color for content inside the panel */
+.theme-designer-panel h2, .theme-designer-panel label {
+    color: var(--font-color);
+}
+
 
 /* --- Tank Game Lobby FIX --- */
 .journal-card button {
-    position: relative; /* Ensures the button is on top of its parent */
+    position: relative;
     z-index: 2;
 }
+
 
 /* --- Other Styles (unchanged but included for completeness) --- */
 @keyframes rainbow-text { 0% { color: #ff5555; } 17% { color: #ffb86c; } 34% { color: #f1fa8c; } 51% { color: #50fa7b; } 68% { color: #8be9fd; } 85% { color: #bd93f9; } 100% { color: #ff79c6; } }

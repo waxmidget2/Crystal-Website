@@ -19,7 +19,8 @@ export default function ThemeDesigner({ themeParams, setThemeParams, onSave, onC
 
   return (
     <div className="theme-designer-overlay" onClick={onClose}>
-      <div className="theme-designer-panel glass-ui" onClick={(e) => e.stopPropagation()}>
+      {/* The "glass-ui" class has been removed from this div to fix the rendering bug */}
+      <div className="theme-designer-panel" onClick={(e) => e.stopPropagation()}>
         <h2>Pattern Engine</h2>
 
         <div className="form-group">
