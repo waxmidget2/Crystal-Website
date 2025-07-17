@@ -1,171 +1,36 @@
-/* src/index.css */
+/* Add these styles to the bottom of src/index.css */
 
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
-
-:root {
-    /* These will be dynamically overwritten by the theme switcher */
-    --bg-color: #2c2a4a;
-    --primary-accent: #ff79c6;
-    --secondary-accent: #8be9fd;
-    --font-color: #f8f8f2;
-    --font-color-muted: #bd93f9;
-    --glass-bg: rgba(40, 42, 54, 0.75);
-    --glass-border: rgba(255, 255, 255, 0.2);
-    --border-radius-main: 20px;
-    --backdrop-blur: 10px;
+.journal-page-header {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--glass-border);
+  gap: 20px;
 }
 
-.rainbow-dash-mode {
-    --primary-accent: #ff5555;
-    --secondary-accent: #ffb86c;
-    --tertiary-accent: #f1fa8c;
-    --font-color-muted: #50fa7b;
-}
-.rainbow-dash-mode .navbar-title { animation: rainbow-text 3s infinite linear; }
-
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-    font-family: 'Nunito', sans-serif;
-    background-color: var(--bg-color); /* The background is now controlled by this variable */
-    color: var(--font-color);
-    overflow-x: hidden;
-    transition: background-color 0.5s ease;
+.journal-title-section h1 {
+  margin: 0;
+  font-size: 2.5rem;
+  color: var(--font-color);
 }
 
-.App {
-    width: 100vw;
-    min-height: 100vh;
-    padding: 5vh 5vw;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-    z-index: 1;
-}
-
-/* --- Animated Backgrounds --- */
-.background-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    transition: opacity 0.5s ease-in-out;
-    background-color: var(--bg-color);
-}
-
-.bg-starry-night {
-    background-image:
-        radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
-        radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px);
-    background-size: 550px 550px, 350px 350px;
-    background-position: 0 0, 40px 60px;
-    animation: shimmer 15s linear infinite;
-}
-@keyframes shimmer {
-    from { background-position: 0 0, 40px 60px; }
-    to { background-position: -550px -550px, -350px -350px; }
-}
-
-.bg-galaxy {
-    background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
-    overflow: hidden;
-}
-/* This requires pseudo-elements for the stars */
-.bg-galaxy:after, .bg-galaxy:before {
-    content: '';
-    position: absolute;
-    width: 2px;
-    height: 2px;
-    background: white;
-    box-shadow: 
-        600px 800px #fff, 300px 900px #fff, 200px 1150px #fff, 
-        800px 1300px #fff, 1400px 1400px #fff, 1600px 1000px #fff;
-    animation: anim-star 100s linear infinite;
-}
-.bg-galaxy:before {
-    transform: rotate(45deg);
-}
-@keyframes anim-star {
-    from { transform: translateY(0px); }
-    to { transform: translateY(-2000px); }
-}
-
-.bg-ocean-depths {
-    background: linear-gradient(-45deg, #001219, #005f73, #0a9396);
-    background-size: 400% 400%;
-    animation: gradient-flow 18s ease infinite;
-}
-
-.bg-sunset {
-    background: linear-gradient(-45deg, #5f0f40, #e85d04, #f48c06);
-    background-size: 400% 400%;
-    animation: gradient-flow 18s ease infinite;
-}
-
-.bg-enchanted-forest {
-    background: linear-gradient(-45deg, #081c15, #1b4332, #2d6a4f);
-    background-size: 400% 400%;
-    animation: gradient-flow 20s ease infinite;
-}
-
-.bg-synthwave {
-    background: linear-gradient(to top, #232526, #414345);
-    /* Add grid lines */
-    background-image: 
-        linear-gradient(rgba(233, 69, 96, 0.5) 2px, transparent 2px),
-        linear-gradient(90deg, rgba(233, 69, 96, 0.5) 2px, transparent 2px);
-    background-size: 100px 100px;
-    animation: synthwave-grid 5s linear infinite;
-}
-@keyframes synthwave-grid {
-    from { background-position: 0 0; }
-    to { background-position: 0 100px; }
-}
-
-.bg-cotton-candy {
-    background: linear-gradient(-45deg, #ffafcc, #bde0fe, #a2d2ff);
-    background-size: 400% 400%;
-    animation: gradient-flow 15s ease infinite;
-}
-
-.bg-plain {
-    background: var(--bg-color);
-}
-
-@keyframes gradient-flow {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-/* --- Other Styles (mostly unchanged) --- */
-@keyframes rainbow-text { 0% { color: #ff5555; } 17% { color: #ffb86c; } 34% { color: #f1fa8c; } 51% { color: #50fa7b; } 68% { color: #8be9fd; } 85% { color: #bd93f9; } 100% { color: #ff79c6; } }
-.glass-ui { background: var(--glass-bg); border: 2px solid var(--glass-border); border-radius: var(--border-radius-main); backdrop-filter: blur(var(--backdrop-blur)); -webkit-backdrop-filter: blur(var(--backdrop-blur)); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); transition: all 0.3s ease; }
-.glass-ui:hover { border-color: var(--primary-accent); }
-.action-button { padding: 12px 28px; font-size: 1rem; font-weight: 700; color: var(--font-color); border: none; border-radius: var(--border-radius-main); cursor: pointer; transition: all 0.3s ease; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
-.action-button.primary { background-color: var(--primary-accent); }
-.action-button.secondary { background-color: var(--secondary-accent); }
-.action-button:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 20px rgba(0,0,0, 0.3); }
-.action-button:disabled { background-color: #555; cursor: not-allowed; }
-.navbar { width: 100%; max-width: 1200px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding: 10px 20px; }
-.nav-left-group { display: flex; align-items: center; gap: 10px; }
-.navbar-title { font-size: 1.8rem; font-weight: 700; }
-.nav-button { background: none; border: none; font-size: 1.8rem; cursor: pointer; padding: 0 5px; transition: transform 0.3s ease-in-out; display: inline-block; }
-.nav-button:hover { transform: scale(1.2) rotate(15deg); }
-.login-prompt { text-align: center; padding: 50px; }
-.journal-list-container { width: 100%; max-width: 900px; text-align: center; }
-.add-journal-form { display: flex; gap: 15px; padding: 20px; margin: 20px 0 40px 0; }
-.add-journal-form input { flex-grow: 1; padding: 12px; font-size: 1.1rem; background-color: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); border-radius: 10px; color: var(--font-color); }
-.add-journal-form input:focus { outline: 2px solid var(--secondary-accent); }
-.journal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
-.journal-card { padding: 40px 20px; text-decoration: none; color: var(--font-color); transition: all 0.3s ease; }
-.journal-card:hover { transform: translateY(-5px); border-color: var(--secondary-accent); background: rgba(139, 233, 253, 0.1); }
-.journal-card button { position: relative; z-index: 2; }
-.footer { margin-top: 40px; color: var(--font-color-muted); opacity: 0.7; }
-.navbar a {
+.back-to-journals-link {
+  margin: 0; /* Resets previous margin */
   text-decoration: none;
-  color: inherit;
+  color: var(--font-color-muted);
+  transition: color 0.2s ease;
+}
+
+.back-to-journals-link:hover {
+  color: var(--secondary-accent);
+}
+
+/* --- Item Card Image FIX --- */
+/* This gives a dark backdrop to transparent images */
+.crystal-button img {
+  background-color: rgba(0, 0, 0, 0.2);
 }
