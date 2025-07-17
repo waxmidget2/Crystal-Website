@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { db } from '../firebase';
-import { collection, addDoc, doc, onSnapshot, updateDoc, arrayUnion, deleteDoc, serverTimestamp, setDoc, query, where, Timestamp, writeBatch, getDocs } from 'firebase/firestore';
+import { collection, addDoc, doc, onSnapshot, updateDoc, arrayUnion, deleteDoc, serverTimestamp, setDoc, query, where, Timestamp, writeBatch, getDocs, getDoc } from 'firebase/firestore';
 import Loader from '../components/Loader';
 
 // --- Game Constants ---
@@ -11,7 +11,7 @@ const CANVAS_WIDTH = 600;
 const CANVAS_HEIGHT = 600;
 const TICK_RATE = 120; // ms per game tick
 
-// --- Main Component ---
+// --- Main Game Component ---
 export default function SnakeGamePage({ user }) {
   const [currentGameId, setCurrentGameId] = useState(null);
   const [isSpectator, setIsSpectator] = useState(false);
@@ -48,7 +48,7 @@ function GameLobby({ user, onJoinGame, onSpectateGame }) {
       setLoading(false);
     });
 
-    const q = query(gamesRef, where("gameState", "==", "active"));
+    const q = query(gamesRef, where("gameState", "in", ["active", "single-player"]));
     const unsubscribeActive = onSnapshot(q, (snapshot) => {
         const spectateGames = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setActiveGames(spectateGames);
@@ -151,16 +151,17 @@ function GameLobby({ user, onJoinGame, onSpectateGame }) {
 function GameCanvas({ user, gameId, isSpectator, onExitGame }) {
   const canvasRef = useRef(null);
   const gameStateRef = useRef(null);
-  const playerDirectionRef = useRef({ x: 0, y: 0 });
 
+  // --- INPUT HANDLING (THE FIX) ---
+  // This effect now sends the player's direction directly to Firestore.
   useEffect(() => {
-    if (isSpectator) return; // Spectators don't control anything
+    if (isSpectator) return; // Spectators don't send input.
 
     const handleKeyDown = (e) => {
       const mySnake = gameStateRef.current?.snakes?.[user.uid];
       if (!mySnake) return;
 
-      let newDir = { ...playerDirectionRef.current };
+      let newDir = null;
       switch (e.key) {
         case 'ArrowUp': case 'w': if (mySnake.dir.y === 0) newDir = { x: 0, y: -1 }; break;
         case 'ArrowDown': case 's': if (mySnake.dir.y === 0) newDir = { x: 0, y: 1 }; break;
@@ -168,30 +169,39 @@ function GameCanvas({ user, gameId, isSpectator, onExitGame }) {
         case 'ArrowRight': case 'd': if (mySnake.dir.x === 0) newDir = { x: 1, y: 0 }; break;
         default: break;
       }
-      playerDirectionRef.current = newDir;
+
+      // If a valid new direction was chosen, update it in Firestore.
+      if (newDir) {
+        const gameRef = doc(db, 'snake-games', gameId);
+        updateDoc(gameRef, {
+          [`snakes.${user.uid}.dir`]: newDir
+        });
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [user.uid, isSpectator]);
+  }, [user.uid, gameId, isSpectator]);
 
+  // --- GAME LOOP (THE FIX) ---
+  // The game loop (which only runs for the host) now reads directions for ALL snakes
+  // from the central Firestore state.
   useEffect(() => {
     let gameInterval;
-    const isHost = gameStateRef.current?.players?.[0] === user.uid;
-    const mode = gameStateRef.current?.mode;
+    
+    const runGameTick = async () => {
+      const gameRef = doc(db, 'snake-games', gameId);
+      const gameSnap = await getDoc(gameRef);
+      if (!gameSnap.exists()) return;
 
-    if (isHost || mode === 'single-player') {
-      gameInterval = setInterval(() => {
-        const gameState = gameStateRef.current;
-        if (!gameState || !['active', 'single-player'].includes(gameState.gameState) || gameState.winner) return;
+      const gameState = gameSnap.data();
+      const isHost = gameState.players?.[0] === user.uid;
 
-        const gameRef = doc(db, 'snake-games', gameId);
+      if ((isHost && gameState.gameState === 'active') || gameState.gameState === 'single-player') {
+        if (gameState.winner) return;
+
         const newSnakes = { ...gameState.snakes };
         let newFood = { ...gameState.food };
         let winner = null;
-
-        Object.keys(newSnakes).forEach(pid => {
-            if (pid === user.uid) newSnakes[pid].dir = playerDirectionRef.current;
-        });
 
         const allSnakeSegments = Object.values(newSnakes).flatMap(s => s.body);
 
@@ -222,17 +232,20 @@ function GameCanvas({ user, gameId, isSpectator, onExitGame }) {
         }
         
         if (winner) {
-            updateDoc(gameRef, { winner, gameState: 'finished' });
+          updateDoc(gameRef, { winner, gameState: 'finished' });
         } else {
-            updateDoc(gameRef, { snakes: newSnakes, food: newFood });
+          updateDoc(gameRef, { snakes: newSnakes, food: newFood });
         }
+      }
+    };
 
-      }, TICK_RATE);
-    }
-
+    gameInterval = setInterval(runGameTick, TICK_RATE);
     return () => clearInterval(gameInterval);
   }, [user.uid, gameId]);
 
+
+  // --- DRAWING LOOP ---
+  // This effect listens for game state changes and draws the canvas for everyone.
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -250,10 +263,6 @@ function GameCanvas({ user, gameId, isSpectator, onExitGame }) {
       gameStateRef.current = doc.data();
       const { snakes, food, playerData } = gameStateRef.current;
       
-      if (snakes?.[user.uid] && playerDirectionRef.current.x === 0 && playerDirectionRef.current.y === 0) {
-          playerDirectionRef.current = snakes[user.uid].dir;
-      }
-
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = 'rgba(0,0,0,0.3)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -266,7 +275,7 @@ function GameCanvas({ user, gameId, isSpectator, onExitGame }) {
       if (snakes) {
         for (const playerId in snakes) {
           const snake = snakes[playerId];
-          ctx.fillStyle = playerData[playerId].color;
+          ctx.fillStyle = playerData[playerId]?.color || '#ffffff';
           snake.body.forEach(segment => {
             ctx.fillRect(segment.x * GRID_SIZE, segment.y * GRID_SIZE, GRID_SIZE - 1, GRID_SIZE - 1);
           });
@@ -275,7 +284,7 @@ function GameCanvas({ user, gameId, isSpectator, onExitGame }) {
     });
 
     return unsubscribe;
-  }, [gameId, user.uid, onExitGame]);
+  }, [gameId, onExitGame]);
 
   const gameData = gameStateRef.current;
   const winnerId = gameData?.winner;
