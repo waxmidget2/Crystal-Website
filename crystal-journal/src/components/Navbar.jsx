@@ -11,10 +11,10 @@ export default function Navbar({ user, onThemeClick, toggleRainbowMode }) {
         <Link to="/" style={{textDecoration: 'none', color: 'inherit'}}>
             <h1 className="navbar-title">🔮 Multi-Journal</h1>
         </Link>
-        <Link to="/tank-game" className="nav-button" title="Tank Game">
-          🛡️ Tank Game
+        {/* New Snake Game Icon */}
+        <Link to="/snake-game" className="nav-button" title="Snake Game">
+          🐍
         </Link>
-        {/* The Rainbow Dash button is back! */}
         <button 
           className="nav-button" 
           onClick={toggleRainbowMode}
@@ -26,7 +26,7 @@ export default function Navbar({ user, onThemeClick, toggleRainbowMode }) {
           <button
             className="nav-button"
             onClick={onThemeClick}
-            title="Design Your Theme"
+            title="Change Theme"
           >
             🎨
           </button>
