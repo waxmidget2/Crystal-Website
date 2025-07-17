@@ -165,10 +165,6 @@ body {
 .journal-card:hover { transform: translateY(-5px); border-color: var(--secondary-accent); background: rgba(139, 233, 253, 0.1); }
 .journal-card button { position: relative; z-index: 2; }
 .footer { margin-top: 40px; color: var(--font-color-muted); opacity: 0.7; }
-.navbar a {
-  text-decoration: none;
-  color: inherit;
-}
 /* Add these styles to the bottom of src/index.css */
 
 .journal-page-header {
