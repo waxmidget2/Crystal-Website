@@ -144,7 +144,17 @@ body {
 /* --- Shared UI Components --- */
 .glass-ui { background: var(--glass-bg); border: 2px solid var(--glass-border); border-radius: var(--border-radius-main); backdrop-filter: blur(var(--backdrop-blur)); -webkit-backdrop-filter: blur(var(--backdrop-blur)); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); transition: all 0.3s ease; }
 .glass-ui:hover { border-color: var(--primary-accent); }
-.action-button { padding: 12px 28px; font-size: 1rem; font-weight: 700; color: var(--font-color); border: none; border-radius: var(--border-radius-main); cursor: pointer; transition: all 0.3s ease; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+.action-button {
+    padding: 12px 28px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--font-color);
+    border: none;
+    border-radius: var(--border-radius-main);
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
 .action-button.primary { background-color: var(--primary-accent); }
 .action-button.secondary { background-color: var(--secondary-accent); }
 .action-button:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 20px rgba(0,0,0, 0.3); }
@@ -227,3 +237,21 @@ body {
 .journal-login-prompt p { font-size: 1.2rem; color: var(--font-color-muted); }
 .journal-login-prompt button { padding: 12px 24px; font-size: 1.1rem; font-weight: 600; color: var(--font-color); background-color: var(--primary-accent); border: none; border-radius: 10px; cursor: pointer; transition: background-color 0.2s ease; }
 .journal-login-prompt button:hover { background-color: var(--secondary-accent); }  
+/* Add these styles to the bottom of src/index.css */
+
+.lobby-actions {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.lobby-section {
+  width: 100%;
+  margin-top: 30px;
+  padding-top: 30px;
+  border-top: 1px solid var(--glass-border);
+}
+
+.lobby-section h2 {
+  margin-bottom: 20px;
+}

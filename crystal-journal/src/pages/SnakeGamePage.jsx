@@ -1,9 +1,8 @@
 // src/pages/SnakeGamePage.jsx
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { db } from '../firebase';
-// Import Timestamp for time-based queries
-import { collection, addDoc, doc, onSnapshot, updateDoc, arrayUnion, deleteDoc, serverTimestamp, setDoc, query, where, Timestamp, writeBatch } from 'firebase/firestore';
+import { collection, addDoc, doc, onSnapshot, updateDoc, arrayUnion, deleteDoc, serverTimestamp, setDoc, query, where, Timestamp, writeBatch, getDocs } from 'firebase/firestore';
 import Loader from '../components/Loader';
 
 // --- Game Constants ---
@@ -12,82 +11,66 @@ const CANVAS_WIDTH = 600;
 const CANVAS_HEIGHT = 600;
 const TICK_RATE = 120; // ms per game tick
 
-// --- Main Game Component ---
+// --- Main Component ---
 export default function SnakeGamePage({ user }) {
   const [currentGameId, setCurrentGameId] = useState(null);
+  const [isSpectator, setIsSpectator] = useState(false);
+
+  const handleExitGame = () => {
+    setCurrentGameId(null);
+    setIsSpectator(false);
+  };
 
   if (!user) {
     return <div className="login-prompt"><h2>Please sign in to play Competitive Snake!</h2></div>;
   }
 
   if (!currentGameId) {
-    return <GameLobby user={user} onJoinGame={setCurrentGameId} />;
+    return <GameLobby user={user} onJoinGame={setCurrentGameId} onSpectateGame={(id) => { setCurrentGameId(id); setIsSpectator(true); }} />;
   }
 
-  return <GameCanvas user={user} gameId={currentGameId} onExitGame={() => setCurrentGameId(null)} />;
+  return <GameCanvas user={user} gameId={currentGameId} isSpectator={isSpectator} onExitGame={handleExitGame} />;
 }
 
 // --- Game Lobby Component ---
-function GameLobby({ user, onJoinGame }) {
-  const [games, setGames] = useState([]);
+function GameLobby({ user, onJoinGame, onSpectateGame }) {
+  const [waitingGames, setWaitingGames] = useState([]);
+  const [activeGames, setActiveGames] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const lobbyRef = collection(db, 'snake-game-lobby');
+    const gamesRef = collection(db, 'snake-games');
 
-    // --- NEW: Function to clean up stale games ---
-    const cleanupOldGames = async () => {
-      console.log("Checking for stale games...");
-      // Calculate the timestamp for 10 minutes ago
-      const tenMinutesAgo = Timestamp.fromMillis(Date.now() - 10 * 60 * 1000);
-      
-      // Create a query for games older than 10 minutes
-      const oldGamesQuery = query(lobbyRef, where("createdAt", "<", tenMinutesAgo));
-      
-      const oldGamesSnapshot = await getDocs(oldGamesQuery);
-      if (oldGamesSnapshot.empty) {
-        console.log("No stale games found.");
-        return;
-      }
-
-      // Use a batch to delete all stale games in one operation
-      const batch = writeBatch(db);
-      oldGamesSnapshot.forEach(doc => {
-        console.log(`Deleting stale game: ${doc.id}`);
-        batch.delete(doc.ref);
-      });
-      await batch.commit();
-    };
-    
-    // Run the cleanup when the lobby loads
-    cleanupOldGames();
-
-    // Set up the real-time listener for active games
-    const unsubscribe = onSnapshot(lobbyRef, (snapshot) => {
+    const unsubscribeLobby = onSnapshot(lobbyRef, (snapshot) => {
       const availableGames = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setGames(availableGames);
+      setWaitingGames(availableGames);
       setLoading(false);
     });
 
-    return unsubscribe;
+    const q = query(gamesRef, where("gameState", "==", "active"));
+    const unsubscribeActive = onSnapshot(q, (snapshot) => {
+        const spectateGames = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setActiveGames(spectateGames);
+    });
+
+    return () => {
+      unsubscribeLobby();
+      unsubscribeActive();
+    };
   }, []);
 
-  const handleCreateGame = async () => {
+  const createGame = async (mode) => {
     setLoading(true);
-    const lobbyRef = collection(db, 'snake-game-lobby');
-    const newLobbyGame = await addDoc(lobbyRef, {
-      creatorId: user.uid,
-      creatorName: user.displayName || "Player 1",
-      createdAt: serverTimestamp()
-    });
-    
-    const gameRef = doc(db, 'snake-games', newLobbyGame.id);
-    await setDoc(gameRef, {
+    const isSinglePlayer = mode === 'single-player';
+
+    const gameData = {
       players: [user.uid],
       playerData: {
         [user.uid]: { name: user.displayName || "Player 1", color: '#8be9fd' }
       },
-      gameState: 'waiting',
+      gameState: isSinglePlayer ? 'single-player' : 'waiting',
+      mode: mode,
       snakes: {
         [user.uid]: {
           body: [{ x: 5, y: 5 }],
@@ -96,9 +79,21 @@ function GameLobby({ user, onJoinGame }) {
       },
       food: { x: 15, y: 15 },
       winner: null,
-    });
-    
-    onJoinGame(newLobbyGame.id);
+      createdAt: serverTimestamp()
+    };
+
+    if (isSinglePlayer) {
+      const newGame = await addDoc(collection(db, 'snake-games'), gameData);
+      onJoinGame(newGame.id);
+    } else {
+      const newLobbyGame = await addDoc(collection(db, 'snake-game-lobby'), {
+        creatorId: user.uid,
+        creatorName: user.displayName || "Player 1",
+        createdAt: serverTimestamp()
+      });
+      await setDoc(doc(db, 'snake-games', newLobbyGame.id), gameData);
+      onJoinGame(newLobbyGame.id);
+    }
   };
 
   const handleJoinGame = async (game) => {
@@ -107,12 +102,8 @@ function GameLobby({ user, onJoinGame }) {
       players: arrayUnion(user.uid),
       [`playerData.${user.uid}`]: { name: user.displayName || "Player 2", color: '#ff79c6' },
       gameState: 'active',
-      [`snakes.${user.uid}`]: {
-        body: [{ x: 24, y: 24 }],
-        dir: { x: -1, y: 0 },
-      }
+      [`snakes.${user.uid}`]: { body: [{ x: 24, y: 24 }], dir: { x: -1, y: 0 } }
     });
-    
     await deleteDoc(doc(db, 'snake-game-lobby', game.id));
     onJoinGame(game.id);
   };
@@ -122,27 +113,49 @@ function GameLobby({ user, onJoinGame }) {
   return (
     <div className="journal-list-container">
       <h1>Competitive Snake</h1>
-      <button onClick={handleCreateGame} className="action-button secondary">Create New Game</button>
-      <div className="journal-grid" style={{marginTop: '20px'}}>
-        {games.length > 0 ? games.map(game => (
-          <div key={game.id} className="journal-card glass-ui">
-            <h2>{game.creatorName}'s Game</h2>
-            <p>Waiting for a challenger...</p>
-            <button onClick={() => handleJoinGame(game)} className="action-button primary">Join Game</button>
-          </div>
-        )) : <p>No available games. Create one!</p>}
+      <div className="lobby-actions">
+        <button onClick={() => createGame('single-player')} className="action-button secondary">Start Single Player</button>
+        <button onClick={() => createGame('two-player')} className="action-button primary">Create 2-Player Game</button>
+      </div>
+
+      <div className="lobby-section">
+        <h2>Join a Game</h2>
+        <div className="journal-grid">
+          {waitingGames.length > 0 ? waitingGames.map(game => (
+            <div key={game.id} className="journal-card glass-ui">
+              <h3>{game.creatorName}'s Game</h3>
+              <p>Waiting for a challenger...</p>
+              <button onClick={() => handleJoinGame(game)} className="action-button primary">Join</button>
+            </div>
+          )) : <p>No available games to join. Create one!</p>}
+        </div>
+      </div>
+
+      <div className="lobby-section">
+        <h2>Spectate a Game</h2>
+        <div className="journal-grid">
+          {activeGames.length > 0 ? activeGames.map(game => (
+            <div key={game.id} className="journal-card glass-ui">
+              <h3>Live Match</h3>
+              <p>{Object.values(game.playerData).map(p => p.name).join(' vs ')}</p>
+              <button onClick={() => onSpectateGame(game.id)} className="action-button secondary">Watch</button>
+            </div>
+          )) : <p>No active games to spectate.</p>}
+        </div>
       </div>
     </div>
   );
 }
 
-// --- Game Canvas and Logic Component (No changes needed here) ---
-function GameCanvas({ user, gameId, onExitGame }) {
+// --- Game Canvas and Logic Component ---
+function GameCanvas({ user, gameId, isSpectator, onExitGame }) {
   const canvasRef = useRef(null);
   const gameStateRef = useRef(null);
   const playerDirectionRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
+    if (isSpectator) return; // Spectators don't control anything
+
     const handleKeyDown = (e) => {
       const mySnake = gameStateRef.current?.snakes?.[user.uid];
       if (!mySnake) return;
@@ -159,63 +172,66 @@ function GameCanvas({ user, gameId, onExitGame }) {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [user.uid]);
+  }, [user.uid, isSpectator]);
 
   useEffect(() => {
     let gameInterval;
     const isHost = gameStateRef.current?.players?.[0] === user.uid;
+    const mode = gameStateRef.current?.mode;
 
-    if (isHost) {
+    if (isHost || mode === 'single-player') {
       gameInterval = setInterval(() => {
         const gameState = gameStateRef.current;
-        if (!gameState || gameState.gameState !== 'active' || gameState.winner) return;
+        if (!gameState || !['active', 'single-player'].includes(gameState.gameState) || gameState.winner) return;
 
         const gameRef = doc(db, 'snake-games', gameId);
         const newSnakes = { ...gameState.snakes };
         let newFood = { ...gameState.food };
         let winner = null;
 
-        newSnakes[user.uid].dir = playerDirectionRef.current;
-        
-        const allSnakeSegments = [];
-        Object.values(newSnakes).forEach(s => allSnakeSegments.push(...s.body));
+        Object.keys(newSnakes).forEach(pid => {
+            if (pid === user.uid) newSnakes[pid].dir = playerDirectionRef.current;
+        });
+
+        const allSnakeSegments = Object.values(newSnakes).flatMap(s => s.body);
 
         for (const playerId in newSnakes) {
+          if (winner) break;
           const snake = newSnakes[playerId];
           const head = { ...snake.body[0] };
           head.x += snake.dir.x;
           head.y += snake.dir.y;
 
           if (head.x < 0 || head.x >= CANVAS_WIDTH / GRID_SIZE || head.y < 0 || head.y >= CANVAS_HEIGHT / GRID_SIZE) {
-            winner = gameState.players.find(p => p !== playerId);
+            winner = gameState.players.find(p => p !== playerId) || "draw";
           }
 
           for (const segment of allSnakeSegments) {
             if (head.x === segment.x && head.y === segment.y) {
-              winner = gameState.players.find(p => p !== playerId);
+              winner = gameState.players.find(p => p !== playerId) || "draw";
             }
           }
 
           snake.body.unshift(head);
 
           if (head.x === newFood.x && head.y === newFood.y) {
-            newFood = {
-              x: Math.floor(Math.random() * (CANVAS_WIDTH / GRID_SIZE)),
-              y: Math.floor(Math.random() * (CANVAS_HEIGHT / GRID_SIZE)),
-            };
+            newFood = { x: Math.floor(Math.random() * (CANVAS_WIDTH / GRID_SIZE)), y: Math.floor(Math.random() * (CANVAS_HEIGHT / GRID_SIZE)) };
           } else {
             snake.body.pop();
           }
         }
         
-        updateDoc(gameRef, { snakes: newSnakes, food: newFood, winner });
+        if (winner) {
+            updateDoc(gameRef, { winner, gameState: 'finished' });
+        } else {
+            updateDoc(gameRef, { snakes: newSnakes, food: newFood });
+        }
 
       }, TICK_RATE);
     }
 
     return () => clearInterval(gameInterval);
   }, [user.uid, gameId]);
-
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -242,15 +258,19 @@ function GameCanvas({ user, gameId, onExitGame }) {
       ctx.fillStyle = 'rgba(0,0,0,0.3)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.fillStyle = 'yellow';
-      ctx.fillRect(food.x * GRID_SIZE, food.y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
+      if (food) {
+        ctx.fillStyle = 'yellow';
+        ctx.fillRect(food.x * GRID_SIZE, food.y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
+      }
 
-      for (const playerId in snakes) {
-        const snake = snakes[playerId];
-        ctx.fillStyle = playerData[playerId].color;
-        snake.body.forEach(segment => {
-          ctx.fillRect(segment.x * GRID_SIZE, segment.y * GRID_SIZE, GRID_SIZE - 1, GRID_SIZE - 1);
-        });
+      if (snakes) {
+        for (const playerId in snakes) {
+          const snake = snakes[playerId];
+          ctx.fillStyle = playerData[playerId].color;
+          snake.body.forEach(segment => {
+            ctx.fillRect(segment.x * GRID_SIZE, segment.y * GRID_SIZE, GRID_SIZE - 1, GRID_SIZE - 1);
+          });
+        }
       }
     });
 
@@ -259,15 +279,15 @@ function GameCanvas({ user, gameId, onExitGame }) {
 
   const gameData = gameStateRef.current;
   const winnerId = gameData?.winner;
-  const winnerData = winnerId ? gameData?.playerData[winnerId] : null;
+  const winnerData = winnerId && winnerId !== "draw" ? gameData?.playerData[winnerId] : null;
 
   return (
     <div style={{ textAlign: 'center', width: '100%' }}>
       <h1>Competitive Snake</h1>
-      {winnerData ? (
-        <h2>{winnerData.name} is the WINNER!</h2>
+      {winnerId ? (
+        <h2>{winnerData ? `${winnerData.name} is the WINNER!` : "It's a DRAW!"}</h2>
       ) : (
-        <p><strong>Controls:</strong> WASD or Arrow Keys to Move</p>
+        <p><strong>{isSpectator ? "You are spectating." : "Controls: WASD or Arrow Keys to Move"}</strong></p>
       )}
       <canvas ref={canvasRef} style={{ borderRadius: '15px', border: '2px solid var(--glass-border)' }} />
       <button onClick={onExitGame} className="action-button primary" style={{marginTop: '20px'}}>Exit Game</button>
