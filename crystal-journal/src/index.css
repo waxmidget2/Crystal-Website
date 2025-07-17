@@ -330,3 +330,98 @@ body {
 .secret-journal-theme .navbar-title {
   text-shadow: 0 0 10px var(--primary-accent);
 }
+/* Add these styles to the bottom of src/index.css */
+
+/* --- Theme Designer Panel --- */
+.theme-designer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 99;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-designer-panel {
+  width: 100%;
+  max-width: 400px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.theme-designer-panel h2 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.theme-color-picker {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.theme-color-picker label {
+  font-weight: 600;
+  color: var(--font-color-muted);
+}
+
+.theme-color-picker input[type="color"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 50px;
+  height: 50px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+.theme-color-picker input[type="color"]::-webkit-color-swatch {
+  border-radius: 50%;
+  border: 2px solid var(--glass-border);
+}
+.theme-color-picker input[type="color"]::-moz-color-swatch {
+  border-radius: 50%;
+  border: 2px solid var(--glass-border);
+}
+
+.theme-designer-buttons {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+/* --- Editable Summary --- */
+.summary-text-editable {
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 10px;
+  transition: background-color 0.2s ease;
+}
+
+.summary-text-editable:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.summary-textarea {
+  width: 100%;
+  min-height: 150px;
+  margin-top: 10px;
+  padding: 10px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: var(--font-color);
+  background-color: rgba(0,0,0,0.2);
+  border: 1px solid var(--primary-accent);
+  border-radius: 10px;
+  resize: vertical;
+}
+.summary-textarea:focus {
+  outline: 2px solid var(--secondary-accent);
+}
