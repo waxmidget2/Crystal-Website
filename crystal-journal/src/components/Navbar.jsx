@@ -12,7 +12,7 @@ export default function Navbar({ user, onThemeClick, toggleRainbowMode }) {
             <h1 className="navbar-title">🔮 Multi-Journal</h1>
         </Link>
         <Link to="/tank-game" className="nav-button" title="Tank Game">
-          坦克
+
         </Link>
         {/* The Rainbow Dash button is back! */}
         <button 

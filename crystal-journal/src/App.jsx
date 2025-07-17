@@ -99,7 +99,6 @@ function App() {
           <Route path="/journal/:journalId/item/:itemId" element={<ItemPage user={user} />} />
           <Route path="/tank-game" element={<TankGamePage user={user} />} />
         </Routes>
-        <footer className="footer">Create your own magic!</footer>
       </div>
       {showThemeDesigner && (
         <ThemeDesigner
