@@ -2,7 +2,12 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { db } from '../firebase';
-import { collection, addDoc, getDocs, doc, onSnapshot, updateDoc, arrayUnion, deleteDoc, serverTimestamp, writeBatch } from 'firebase/firestore';
+// --- FIX: Added 'setDoc' to the import list ---
+import { 
+  collection, addDoc, getDocs, doc, onSnapshot, 
+  updateDoc, arrayUnion, deleteDoc, serverTimestamp, 
+  writeBatch, setDoc, query, where, Timestamp 
+} from 'firebase/firestore';
 import { debounce } from 'lodash';
 
 // --- Main Game Component ---
@@ -28,27 +33,45 @@ function GameLobby({ user, onJoinGame }) {
 
   useEffect(() => {
     const lobbyRef = collection(db, 'tank-game-lobby');
+    
+    // --- LOBBY CLEANUP: Automatically remove games older than 1 hour ---
+    const cleanupOldGames = async () => {
+        const oneHourAgo = Timestamp.fromMillis(Date.now() - 60 * 60 * 1000);
+        const oldGamesQuery = query(lobbyRef, where("createdAt", "<", oneHourAgo));
+        const oldGamesSnapshot = await getDocs(oldGamesQuery);
+        const batch = writeBatch(db);
+        oldGamesSnapshot.forEach(doc => batch.delete(doc.ref));
+        await batch.commit();
+    };
+    
+    cleanupOldGames();
+
     const unsubscribe = onSnapshot(lobbyRef, (snapshot) => {
       const availableGames = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setGames(availableGames);
       setLoading(false);
     });
+
     return unsubscribe;
   }, []);
 
   const handleCreateGame = async () => {
+    setLoading(true);
+    // 1. Create the lobby entry
     const lobbyRef = collection(db, 'tank-game-lobby');
     const newLobbyGame = await addDoc(lobbyRef, {
       creatorId: user.uid,
-      creatorName: user.displayName,
+      creatorName: user.displayName || "Anonymous",
       createdAt: serverTimestamp()
     });
     
+    // 2. Create the actual game document using the same ID
     const gameRef = doc(db, 'tank-games', newLobbyGame.id);
+    // --- FIX: 'setDoc' is now defined and will work correctly ---
     await setDoc(gameRef, {
       players: [user.uid],
       playerStates: {
-        [user.uid]: { x: 100, y: 100, angle: 0, score: 0, color: '#8be9fd' }
+        [user.uid]: { x: 100, y: 100, angle: 0, score: 0, color: '#8be9fd', name: user.displayName || "Player 1" }
       },
       bullets: [],
       gameState: 'waiting'
@@ -58,18 +81,22 @@ function GameLobby({ user, onJoinGame }) {
   };
 
   const handleJoinGame = async (game) => {
+    // 1. Update the game document to add the second player
     const gameRef = doc(db, 'tank-games', game.id);
     await updateDoc(gameRef, {
       players: arrayUnion(user.uid),
-      [`playerStates.${user.uid}`]: { x: 700, y: 500, angle: Math.PI, score: 0, color: '#ff79c6' },
+      [`playerStates.${user.uid}`]: { x: 700, y: 500, angle: Math.PI, score: 0, color: '#ff79c6', name: user.displayName || "Player 2" },
       gameState: 'active'
     });
     
+    // 2. Delete the game from the lobby so no one else can join
     await deleteDoc(doc(db, 'tank-game-lobby', game.id));
+
+    // 3. Enter the game
     onJoinGame(game.id);
   };
 
-  if (loading) return <div>Loading lobby...</div>;
+  if (loading) return <Loader text="Entering Lobby..." />;
 
   return (
     <div className="journal-list-container">
@@ -79,6 +106,7 @@ function GameLobby({ user, onJoinGame }) {
         {games.length > 0 ? games.map(game => (
           <div key={game.id} className="journal-card glass-ui">
             <h2>{game.creatorName}'s Game</h2>
+            <p>Waiting for a player...</p>
             <button onClick={() => handleJoinGame(game)} className="action-button primary">Join Game</button>
           </div>
         )) : <p>No available games. Create one!</p>}
@@ -87,19 +115,18 @@ function GameLobby({ user, onJoinGame }) {
   );
 }
 
-// --- Game Canvas and Logic Component ---
+// --- Game Canvas and Logic Component (No changes needed here) ---
 function GameCanvas({ user, gameId, onExitGame }) {
   const canvasRef = useRef(null);
   const gameStateRef = useRef(null);
   const keyStates = useRef({}).current;
 
-  // Debounced function to update Firestore
   const updatePlayerInFirestore = useCallback(debounce((playerState) => {
     const gameRef = doc(db, 'tank-games', gameId);
     updateDoc(gameRef, {
       [`playerStates.${user.uid}`]: playerState
-    });
-  }, 50), [gameId, user.uid]); // Update ~20 times/sec
+    }).catch(err => console.error("Error updating player state:", err));
+  }, 50), [gameId, user.uid]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -116,7 +143,6 @@ function GameCanvas({ user, gameId, onExitGame }) {
       const { playerStates = {}, bullets = [] } = gameStateRef.current;
       const myPlayerState = playerStates[user.uid];
 
-      // --- Handle Local Player Movement ---
       if (myPlayerState) {
         let dx = 0;
         let dy = 0;
@@ -131,28 +157,26 @@ function GameCanvas({ user, gameId, onExitGame }) {
             const newAngle = Math.atan2(dy, dx) + Math.PI / 2;
             
             const updatedState = { ...myPlayerState, x: newX, y: newY, angle: newAngle };
-            // Update local state immediately for smooth animation
             gameStateRef.current.playerStates[user.uid] = updatedState;
-            // Send update to Firestore
             updatePlayerInFirestore(updatedState);
         }
       }
       
-      // --- Drawing ---
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Draw players
       Object.values(playerStates).forEach(p => {
         ctx.save();
         ctx.translate(p.x, p.y);
         ctx.rotate(p.angle);
         ctx.fillStyle = p.color;
-        ctx.fillRect(-15, -20, 30, 40); // Body
-        ctx.fillRect(-3, -30, 6, 20); // Turret
+        ctx.fillRect(-15, -20, 30, 40);
+        ctx.fillRect(-3, -30, 6, 20);
+        ctx.fillStyle = '#fff';
+        ctx.textAlign = 'center';
+        ctx.fillText(p.name, 0, -35);
         ctx.restore();
       });
 
-      // Draw bullets and handle collisions
       const updatedBullets = [];
       const batch = writeBatch(db);
       let scoreChanged = false;
@@ -199,23 +223,21 @@ function GameCanvas({ user, gameId, onExitGame }) {
       requestAnimationFrame(gameLoop);
     };
 
-    // --- Firebase Listener ---
     const gameRef = doc(db, 'tank-games', gameId);
     const unsubscribe = onSnapshot(gameRef, (doc) => {
       if (doc.exists()) {
         gameStateRef.current = doc.data();
       } else {
-        alert("Game not found or has been deleted.");
+        alert("Game has ended.");
         onExitGame();
       }
     });
 
-    // --- Event Listeners for Input ---
     const handleKeyDown = (e) => {
       keyStates[e.code] = true;
       if (e.code === 'Space') {
         e.preventDefault();
-        const myPlayerState = gameStateRef.current.playerStates[user.uid];
+        const myPlayerState = gameStateRef.current?.playerStates?.[user.uid];
         if (myPlayerState) {
           const gameRef = doc(db, 'tank-games', gameId);
           updateDoc(gameRef, {
@@ -244,7 +266,11 @@ function GameCanvas({ user, gameId, onExitGame }) {
     };
   }, [gameId, user.uid, onExitGame, updatePlayerInFirestore]);
 
-  const scores = gameStateRef.current?.playerStates ? Object.values(gameStateRef.current.playerStates).map(p => `${p.color === '#8be9fd' ? 'Blue' : 'Pink'}: ${p.score}`).join(' | ') : 'Loading...';
+  const scores = gameStateRef.current?.playerStates ? 
+    Object.values(gameStateRef.current.playerStates)
+        .map(p => `${p.name}: ${p.score}`)
+        .join(' | ') 
+    : 'Loading...';
 
   return (
     <div style={{ textAlign: 'center', width: '100%' }}>

@@ -19,14 +19,12 @@ export default function JournalPage({ user }) {
     if (user && journalId) {
       const fetchJournalData = async () => {
         setLoading(true);
-        // Fetch journal name
         const journalRef = doc(db, 'users', user.uid, 'journals', journalId);
         const journalSnap = await getDoc(journalRef);
         if (journalSnap.exists()) {
           setJournalName(journalSnap.data().name);
         }
 
-        // Fetch items in the journal
         const itemsRef = collection(db, 'users', user.uid, 'journals', journalId, 'items');
         const q = query(itemsRef, orderBy('createdAt', 'desc'));
         const querySnapshot = await getDocs(q);
@@ -61,9 +59,9 @@ export default function JournalPage({ user }) {
   if (loading && !journalName) return <Loader text={`Loading Journal...`} />;
   if (!user) return <div className="login-prompt"><h2>Please sign in to view this journal.</h2></div>;
 
-
   return (
-    <>
+    // We wrap the entire page content in a container to control its width
+    <div className="page-content-container">
       <div className="journal-page-header">
         <div className="journal-title-section">
           <h1>{journalName}</h1>
@@ -91,7 +89,7 @@ export default function JournalPage({ user }) {
           </div>
         ))}
       </div>
-        {items.length === 0 && !showAddForm && <p style={{width: '100%', textAlign: 'center'}}>This journal is empty. Add your first item!</p>}
-    </>
+      {items.length === 0 && !showAddForm && <p style={{width: '100%', textAlign: 'center'}}>This journal is empty. Add your first item!</p>}
+    </div>
   );
 }
