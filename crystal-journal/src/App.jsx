@@ -29,9 +29,8 @@ function App() {
   const [user, loading] = useAuthState(auth);
   const [themeParams, setThemeParams] = useState(defaultThemeParams);
   const [showThemeDesigner, setShowThemeDesigner] = useState(false);
-  const [isRainbowMode, setIsRainbowMode] = useState(false); // <-- RAINBOW MODE STATE IS BACK
+  const [isRainbowMode, setIsRainbowMode] = useState(false);
 
-  // Function to toggle Rainbow Dash mode
   const toggleRainbowMode = () => {
     setIsRainbowMode(prevMode => !prevMode);
   };
@@ -42,7 +41,10 @@ function App() {
         const themeRef = doc(db, 'users', user.uid, 'data', 'theme');
         const themeSnap = await getDoc(themeRef);
         if (themeSnap.exists()) {
-          setThemeParams(themeSnap.data());
+          // --- THE FIX IS HERE ---
+          // Merge the loaded data with the defaults to prevent missing properties.
+          const loadedData = themeSnap.data();
+          setThemeParams(prevTheme => ({ ...defaultThemeParams, ...loadedData }));
         } else {
           setThemeParams(defaultThemeParams);
         }
@@ -86,12 +88,11 @@ function App() {
   return (
     <Router>
       <DynamicBackground themeParams={themeParams} />
-      {/* The rainbow-dash-mode class is now correctly applied */}
       <div className={`App ${isRainbowMode ? 'rainbow-dash-mode' : ''}`}>
         <Navbar 
           user={user} 
           onThemeClick={() => setShowThemeDesigner(true)}
-          toggleRainbowMode={toggleRainbowMode} // Pass the function down
+          toggleRainbowMode={toggleRainbowMode}
         />
         <Routes>
           <Route path="/" element={<JournalListPage user={user} />} />
@@ -99,6 +100,7 @@ function App() {
           <Route path="/journal/:journalId/item/:itemId" element={<ItemPage user={user} />} />
           <Route path="/tank-game" element={<TankGamePage user={user} />} />
         </Routes>
+        <footer className="footer">Create your own magic!</footer>
       </div>
       {showThemeDesigner && (
         <ThemeDesigner
