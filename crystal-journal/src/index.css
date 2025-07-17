@@ -242,16 +242,59 @@ body {
   color: var(--font-color-muted);
 }
 /* Add these styles to the bottom of src/index.css */
-
 /* --- Tank Game Styles --- */
-.tank-game-container {
+.game-wrapper {
   position: fixed;
   bottom: 20px;
   right: 20px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.game-opener-button {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  margin-top: 10px; /* Add space between game and button */
+}
+
+.game-opener-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.tank-game-container {
   width: 400px;
   max-width: 90vw;
-  z-index: 1000;
-  transition: all 0.3s ease-in-out;
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Fun bouncy transition */
+  transform-origin: bottom right;
+}
+
+/* State for when the game is closed */
+.tank-game-container.closed {
+  transform: scale(0);
+  opacity: 0;
+  pointer-events: none;
+  height: 0;
+}
+
+/* State for when the game is open */
+.tank-game-container.open {
+  transform: scale(1);
+  opacity: 1;
 }
 
 .tank-game-canvas {
@@ -277,7 +320,6 @@ body {
 .tank-game-controls .action-button {
   padding: 8px 16px;
 }
-
 /* --- Secret Journal Easter Egg Style --- */
 .secret-journal-theme {
   --bg-color: #1d1a30;
