@@ -2,13 +2,13 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { db } from '../firebase';
-// --- FIX: Added 'setDoc' to the import list ---
 import { 
   collection, addDoc, getDocs, doc, onSnapshot, 
   updateDoc, arrayUnion, deleteDoc, serverTimestamp, 
   writeBatch, setDoc, query, where, Timestamp 
 } from 'firebase/firestore';
 import { debounce } from 'lodash';
+import Loader from '../components/Loader'; // <-- THE MISSING IMPORT IS NOW ADDED
 
 // --- Main Game Component ---
 export default function TankGamePage({ user }) {
@@ -34,7 +34,6 @@ function GameLobby({ user, onJoinGame }) {
   useEffect(() => {
     const lobbyRef = collection(db, 'tank-game-lobby');
     
-    // --- LOBBY CLEANUP: Automatically remove games older than 1 hour ---
     const cleanupOldGames = async () => {
         const oneHourAgo = Timestamp.fromMillis(Date.now() - 60 * 60 * 1000);
         const oldGamesQuery = query(lobbyRef, where("createdAt", "<", oneHourAgo));
@@ -57,7 +56,6 @@ function GameLobby({ user, onJoinGame }) {
 
   const handleCreateGame = async () => {
     setLoading(true);
-    // 1. Create the lobby entry
     const lobbyRef = collection(db, 'tank-game-lobby');
     const newLobbyGame = await addDoc(lobbyRef, {
       creatorId: user.uid,
@@ -65,9 +63,7 @@ function GameLobby({ user, onJoinGame }) {
       createdAt: serverTimestamp()
     });
     
-    // 2. Create the actual game document using the same ID
     const gameRef = doc(db, 'tank-games', newLobbyGame.id);
-    // --- FIX: 'setDoc' is now defined and will work correctly ---
     await setDoc(gameRef, {
       players: [user.uid],
       playerStates: {
@@ -81,7 +77,6 @@ function GameLobby({ user, onJoinGame }) {
   };
 
   const handleJoinGame = async (game) => {
-    // 1. Update the game document to add the second player
     const gameRef = doc(db, 'tank-games', game.id);
     await updateDoc(gameRef, {
       players: arrayUnion(user.uid),
@@ -89,13 +84,11 @@ function GameLobby({ user, onJoinGame }) {
       gameState: 'active'
     });
     
-    // 2. Delete the game from the lobby so no one else can join
     await deleteDoc(doc(db, 'tank-game-lobby', game.id));
-
-    // 3. Enter the game
     onJoinGame(game.id);
   };
 
+  // --- FIX: Use the actual Loader component ---
   if (loading) return <Loader text="Entering Lobby..." />;
 
   return (
@@ -115,7 +108,7 @@ function GameLobby({ user, onJoinGame }) {
   );
 }
 
-// --- Game Canvas and Logic Component (No changes needed here) ---
+// --- Game Canvas and Logic Component ---
 function GameCanvas({ user, gameId, onExitGame }) {
   const canvasRef = useRef(null);
   const gameStateRef = useRef(null);
