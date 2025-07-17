@@ -13,7 +13,7 @@ export default function JournalPage({ user }) {
   const [items, setItems] = useState([]);
   const [journalName, setJournalName] = useState('');
   const [loading, setLoading] = useState(true);
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false); // This now controls the modal
 
   useEffect(() => {
     if (user && journalId) {
@@ -40,7 +40,7 @@ export default function JournalPage({ user }) {
 
   const handleItemAdded = (newItem) => {
     setItems(prev => [newItem, ...prev]);
-    setShowAddForm(false);
+    setShowAddForm(false); // Close the modal after adding an item
   };
 
   const handleDelete = async (itemId, imageUrl) => {
@@ -60,19 +60,32 @@ export default function JournalPage({ user }) {
   if (!user) return <div className="login-prompt"><h2>Please sign in to view this journal.</h2></div>;
 
   return (
-    // We wrap the entire page content in a container to control its width
     <div className="page-content-container">
       <div className="journal-page-header">
         <div className="journal-title-section">
           <h1>{journalName}</h1>
           <Link to="/" className="back-to-journals-link">← Back to All Journals</Link>
         </div>
-        <button className="action-button secondary" onClick={() => setShowAddForm(!showAddForm)}>
-          {showAddForm ? 'Cancel' : '＋ Add Item'}
+        <button className="action-button secondary" onClick={() => setShowAddForm(true)}>
+          ＋ Add Item
         </button>
       </div>
 
-      {showAddForm && <AddItemForm journalId={journalId} onItemAdded={handleItemAdded} user={user} />}
+      {/* The AddItemForm is now wrapped in a modal overlay */}
+      {showAddForm && (
+        <div className="modal-overlay" onClick={() => setShowAddForm(false)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                <AddItemForm 
+                    journalId={journalId} 
+                    onItemAdded={handleItemAdded} 
+                    user={user} 
+                />
+                 <button className="action-button primary" onClick={() => setShowAddForm(false)} style={{marginTop: '10px'}}>
+                    Cancel
+                </button>
+            </div>
+        </div>
+      )}
 
       <div className="home-grid">
         {items.map(item => (
