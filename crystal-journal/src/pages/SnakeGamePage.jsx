@@ -203,24 +203,18 @@ function GameCanvas({ user, gameId, isSpectator, onExitGame }) {
     let gameInterval;
     
     const runGameTick = async () => {
-      // Use a direct getDoc to ensure we have the absolute latest state for the check
       const gameRef = doc(db, 'snake-games', gameId);
       const gameSnap = await getDoc(gameRef);
-      if (!gameSnap.exists()) {
-        clearInterval(gameInterval);
-        return;
-      };
+      if (!gameSnap.exists()) return;
 
       const gameState = gameSnap.data();
       
-      // --- HOST AUTHORITY CHECK ---
       const isHost = gameState.players?.[0] === user.uid;
       const isSinglePlayer = gameState.gameState === 'single-player';
 
-      // CRITICAL FIX: Only run the game logic if the current user is the host.
       if (isHost || isSinglePlayer) {
         if (gameState.winner) {
-          clearInterval(gameInterval); // Stop the loop if there's a winner
+          clearInterval(gameInterval);
           return;
         }
 
@@ -264,9 +258,14 @@ function GameCanvas({ user, gameId, isSpectator, onExitGame }) {
       }
     };
 
-    gameInterval = setInterval(runGameTick, TICK_RATE);
+    // CRITICAL FIX: The setInterval is now only started if the user is a player.
+    // Spectators will never run this logic.
+    if (!isSpectator) {
+        gameInterval = setInterval(runGameTick, TICK_RATE);
+    }
+    
     return () => clearInterval(gameInterval);
-  }, [user.uid, gameId]);
+  }, [user.uid, gameId, isSpectator]);
 
 
   // --- DRAWING AND STATE SYNC ---
