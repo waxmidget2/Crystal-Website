@@ -31,8 +31,23 @@ body {
     color: var(--font-color);
     overflow-x: hidden;
     transition: background-color 0.5s ease;
+    /* Animated wavy teal blue background */
     background: linear-gradient(120deg, #23243a 0%, #2c2a4a 60%, #8be9fd 100%);
+    background-size: 200% 200%;
+    animation: wavy-teal-bg 12s ease-in-out infinite;
     background-attachment: fixed;
+}
+
+@keyframes wavy-teal-bg {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 .App {
