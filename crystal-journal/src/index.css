@@ -197,9 +197,11 @@ body {
 .journal-card-link {
   display: flex;
   align-items: center;
+    flex-direction: column;
+    text-align: center;
   justify-content: center;
   width: 100%;
-  height: 100%;
+  height: 50%;
   padding: 20px 2px;
   text-decoration: none;
   color: inherit;
