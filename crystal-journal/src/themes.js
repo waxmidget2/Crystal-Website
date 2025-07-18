@@ -2,14 +2,26 @@
 
 // This array holds the definitions for all our beautiful, pre-designed themes.
 export const themes = [
-  // --- NEW THEMES ADDED HERE ---
   {
-    name: "Surreal Galaxy",
+    name: "Starry Night",
+    bgClass: "bg-starry-night",
+    colors: {
+      '--bg-color': '#0d1b2a',
+      '--primary-accent': '#e0e1dd',
+      '--secondary-accent': '#778da9',
+      '--font-color': '#e0e1dd',
+      '--font-color-muted': '#778da9',
+      '--glass-bg': 'rgba(27, 38, 59, 0.6)',
+      '--glass-border': 'rgba(224, 225, 221, 0.2)',
+    }
+  },
+  {
+    name: "Galaxy",
     bgClass: "bg-galaxy",
     colors: {
       '--bg-color': '#000000',
-      '--primary-accent': '#c77dff', // Vibrant Purple
-      '--secondary-accent': '#7f5af0', // Indigo
+      '--primary-accent': '#c77dff',
+      '--secondary-accent': '#7f5af0',
       '--font-color': '#fffffe',
       '--font-color-muted': '#a7a9be',
       '--glass-bg': 'rgba(46, 49, 72, 0.5)',
@@ -17,22 +29,8 @@ export const themes = [
     }
   },
   {
-    name: "Starry Night",
-    bgClass: "bg-starry-night",
-    colors: {
-      '--bg-color': '#0d1b2a', // Midnight Blue
-      '--primary-accent': '#e0e1dd', // Off-white
-      '--secondary-accent': '#778da9', // Slate Blue
-      '--font-color': '#e0e1dd',
-      '--font-color-muted': '#778da9',
-      '--glass-bg': 'rgba(27, 38, 59, 0.6)',
-      '--glass-border': 'rgba(224, 225, 221, 0.2)',
-    }
-  },
-  // --- EXISTING THEMES BELOW ---
-  {
-    name: "Ocean Depths",
-    bgClass: "bg-ocean-depths",
+    name: "Ocean Waves",
+    bgClass: "bg-ocean-waves",
     colors: {
       '--bg-color': '#001219',
       '--primary-accent': '#94d2bd',
@@ -44,8 +42,8 @@ export const themes = [
     }
   },
   {
-    name: "Sunset",
-    bgClass: "bg-sunset",
+    name: "Geometric Sunset",
+    bgClass: "bg-geometric-sunset",
     colors: {
       '--bg-color': '#231942',
       '--primary-accent': '#f42b03',
@@ -57,8 +55,8 @@ export const themes = [
     }
   },
   {
-    name: "Enchanted Forest",
-    bgClass: "bg-enchanted-forest",
+    name: "Fireflies",
+    bgClass: "bg-fireflies",
     colors: {
       '--bg-color': '#081c15',
       '--primary-accent': '#b7e4c7',
@@ -70,8 +68,8 @@ export const themes = [
     }
   },
   {
-    name: "Synthwave",
-    bgClass: "bg-synthwave",
+    name: "Synthwave Grid",
+    bgClass: "bg-synthwave-grid",
     colors: {
       '--bg-color': '#1a1a2e',
       '--primary-accent': '#e94560',
@@ -83,8 +81,8 @@ export const themes = [
     }
   },
   {
-    name: "Cotton Candy",
-    bgClass: "bg-cotton-candy",
+    name: "Pastel Stripes",
+    bgClass: "bg-pastel-stripes",
     colors: {
       '--bg-color': '#f7cad0',
       '--primary-accent': '#c1121f',
@@ -98,7 +96,7 @@ export const themes = [
   {
     name: "Plain",
     bgClass: "bg-plain",
-    colors: { 
+    colors: {
       '--bg-color': '#1a1a2e',
       '--primary-accent': '#e94560',
       '--secondary-accent': '#00f5d4',
