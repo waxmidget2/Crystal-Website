@@ -343,6 +343,34 @@ body {
 .crystal-link:visited {
     text-decoration: none;
 }
+.journal-card {
+    position: relative;
+    padding: 40px 20px;
+    text-decoration: none;
+    color: var(--font-color);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+.journal-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--secondary-accent);
+    background: rgba(139, 233, 253, 0.1);
+}
+.journal-card button {
+    position: relative;
+    z-index: 2;
+}   
+.journal-card:hover .delete-button {
+    opacity: 1;
+    transform: scale(1.1);
+}
+.journal-card:visited {
+    color: var(--font-color);
+    text-decoration: none; /* Remove underline for visited links */
+}
 .journal-card .delete-button {
     position: absolute;
     top: 10px;
