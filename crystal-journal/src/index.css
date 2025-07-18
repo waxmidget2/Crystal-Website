@@ -332,6 +332,18 @@ body {
 .crystal-button:disabled:active {
     transform: none; /* Prevent active effects on disabled buttons */
 }
+.crystal-link {
+    color: var(--font-color);
+    text-decoration: none; /* Remove underline for links */
+    transition: color 0.2s ease;
+}
+.crystal-link:hover {
+    color: var(--secondary-accent);
+    text-decoration: underline; /* Add underline on hover */
+}
+.crystal-link:visited {
+    color: var(--font-color-muted); /* Change color for visited links */
+}
 .journal-card .delete-button {
     position: absolute;
     top: 10px;
