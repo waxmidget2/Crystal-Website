@@ -465,3 +465,27 @@ body {
 .journal-card .delete-button {
     pointer-events: auto;
 }
+
+/* Trippy wavy black-and-white background */
+.bg-trippy-waves {
+  background: repeating-linear-gradient(
+    120deg,
+    #fff 0px 20px,
+    #000 20px 40px
+  );
+  background-size: 200% 200%;
+  animation: trippy-waves-anim 8s ease-in-out infinite;
+  filter: blur(0.5px) brightness(1.1) contrast(1.2);
+}
+
+@keyframes trippy-waves-anim {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
