@@ -187,16 +187,16 @@ body {
 /* --- Journal Card (Lobby & List) - DEFINITIVE FIX --- */
 .journal-card {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 20px;
-  text-decoration: none;
-  color: var(--font-color);
   transition: all 0.3s ease;
 }
 .journal-card:hover { transform: translateY(-5px); border-color: var(--secondary-accent); background: rgba(139, 233, 253, 0.1); }
 .journal-card-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 40px 20px;
   text-decoration: none;
   color: inherit;
 }
@@ -272,51 +272,4 @@ body {
 @keyframes pulse {
     0%, 100% { transform: scale(1); opacity: 1; }
     50% { transform: scale(1.1); opacity: 0.7; }
-}
-.loader-text {
-    font-size: 24px;
-    color: var(--font-color);
-    text-align: center;
-    animation: fadeIn 1s ease-in-out;
-}
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}   
-/* --- Back Button --- */
-.back-button {
-    color: var(--font-color);
-    text-decoration: none;
-    font-size: 1.2rem;
-    margin-bottom: 20px;
-    transition: color 0.2s ease;
-}
-.back-button:hover {
-    color: var(--secondary-accent);
-}
-.back-button:visited {
-    color: var(--font-color-muted);
-}       
-/* --- Misc Styles --- */
-.crystal-link {
-    color: var(--font-color);
-    text-decoration: none;
-    transition: color 0.2s ease;
-}
-.crystal-link:hover {
-    color: var(--secondary-accent);
-}
-.crystal-link:visited {
-    color: var(--font-color-muted);
-}   
-/* --- Back Button Styles --- */
-.back-button,
-.back-button:visited,
-.back-button:active,
-.back-button:hover {
-    text-decoration: none;
-    color: var(--font-color);
-    font-size: 1.2rem;
-    margin-bottom: 20px;
-    transition: color 0.2s ease;
 }
