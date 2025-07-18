@@ -341,7 +341,7 @@ body {
     text-decoration: none; /* Add underline on hover */
 }
 .crystal-link:visited {
-    color: var(--font-color-muted); /* Change color for visited links */
+    text-decoration: none;
 }
 .journal-card .delete-button {
     position: absolute;
