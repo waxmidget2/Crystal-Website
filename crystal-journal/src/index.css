@@ -230,7 +230,7 @@ body {
 .glass-ui { background: var(--glass-bg); border: 2px solid var(--glass-border); border-radius: var(--border-radius-main); backdrop-filter: blur(var(--backdrop-blur)); -webkit-backdrop-filter: blur(var(--backdrop-blur)); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); transition: all 0.3s ease; }
 .glass-ui:hover { border-color: var(--primary-accent); }
 .action-button { padding: 12px 28px; font-size: 1rem; font-weight: 700; color: var(--font-color); border: none; border-radius: var(--border-radius-main); cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease; /* Removed text-shadow */ }
-.action-button.primary { background-color: var(--primary-accent); }
+.action-button.primary { background-color: var(--primary-accent); color: #fff; /* Always white text for contrast */ }
 .action-button.secondary { background-color: var(--secondary-accent); }
 .action-button:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 20px rgba(0,0,0, 0.3); }
 .action-button:disabled { background-color: #555; cursor: not-allowed; }
