@@ -328,21 +328,88 @@ body {
 /* Add these styles to the bottom of src/index.css */
 
 /* --- Journal Card Delete Button --- */
+/* Journal Card (Lobby & List) */
 .journal-card {
-  position: relative; /* This is required for the absolute positioning of the button */
+  position: relative; /* Keep for the delete button */
+  text-decoration: none;
+  color: var(--font-color);
+  transition: all 0.3s ease;
+  /* Padding is removed from here */
 }
 
 /* Make the delete button appear on hover for journal cards */
 .journal-card:hover .delete-button {
   opacity: 1;
 }
-
+/* Make the entire card a clickable link area and center the text */
 .journal-card-link {
-  display: flex; /* Use flexbox for alignment */
-  align-items: center; /* Vertically center */
-  justify-content: center; /* Horizontally center */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   height: 100%;
+  padding: 40px 20px; /* Padding is moved here */
   text-decoration: none;
   color: inherit;
+}
+.background-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    transition: opacity 0.5s ease-in-out;
+    background-color: var(--bg-color);
+    /* This is needed for the surreal galaxy effect */
+    perspective: 600px;
+}
+
+/* --- NEW Starry Night --- */
+.bg-starry-night {
+    background-image:
+        radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
+        radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px),
+        radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 40px),
+        radial-gradient(rgba(255,255,255,.4), rgba(255,255,255,.1) 2px, transparent 30px);
+    background-size: 550px 550px, 350px 350px, 250px 250px, 150px 150px;
+    background-position: 0 0, 40px 60px, 130px 270px, 70px 100px;
+    animation: shimmer 15s linear infinite;
+}
+@keyframes shimmer {
+    from { background-position: 0 0, 40px 60px, 130px 270px, 70px 100px; }
+    to { background-position: -550px -550px, -350px -350px, -250px -250px, -150px -150px; }
+}
+
+/* --- NEW Surreal Galaxy --- */
+.bg-galaxy {
+    background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+    overflow: hidden;
+}
+.bg-galaxy:after, .bg-galaxy:before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 2px;
+    height: 2px;
+    background: transparent;
+    /* Create hundreds of stars with box-shadow */
+    box-shadow: 
+        -294px 492px #FFF, 196px -432px #FFF, 10px -232px #FFF, 
+        -32px -492px #FFF, -42px -192px #FFF, -194px 232px #FFF, 
+        -180px -432px #FFF, 250px -132px #FFF, 210px 32px #FFF, 
+        -420px -232px #FFF, -394px 432px #FFF, 40px -132px #FFF, 
+        -190px -432px #FFF, 10px 32px #FFF, 20px 232px #FFF, 
+        150px -332px #FFF, -94px 332px #FFF, -40px -532px #FFF;
+    /* The surreal animation */
+    animation: surreal-galaxy 150s linear infinite;
+}
+.bg-galaxy:before {
+    /* Create a second layer of stars and tilt it differently */
+    transform: rotate(90deg);
+}
+@keyframes surreal-galaxy {
+    from { transform: translateY(-1000px) rotateX(75deg); }
+    to { transform: translateY(1000px) rotateX(75deg); }
 }
