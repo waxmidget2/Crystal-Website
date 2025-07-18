@@ -349,14 +349,22 @@ body {
     text-decoration: none;
     color: white;
     border: 2px solid transparent;
-    border-radius: var(--border-radius-main);
-    background: var(--glass-bg);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
+}
+.journal-card {
+    color: white;
+    text-decoration: none;
+}
+.journal-card:visited,
+.journal-card:active,
+.journal-card:hover {
+    color: white;
+    text-decoration: none;
 }
 .journal-card:hover {
     transform: translateY(-5px);
