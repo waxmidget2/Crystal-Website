@@ -224,7 +224,12 @@ body {
 .crystal-summary-sidebar, .journal-area { padding: 30px; min-height: 60vh; }
 .summary-image { width: 100%; max-width: 250px; height: 250px; object-fit: cover; border-radius: 50%; margin-bottom: 20px; border: 5px solid; box-shadow: 0 0 25px rgba(255,255,255,0.1); background-color: rgba(0,0,0,0.3); }
 .summary-title { font-size: 2.8rem; margin-bottom: 15px; font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.4); }
-.summary-text { font-size: 1.2rem; line-height: 1.7; color: var(--font-color-muted); }
+.summary-text {
+    font-size: 1.2rem;
+    line-height: 1.7;
+    color: var(--font-color-muted);
+    white-space: pre-wrap; /* <-- THIS IS THE FIX */
+}
 .summary-text-editable { cursor: pointer; padding: 10px; border-radius: 10px; transition: background-color 0.2s ease; }
 .summary-text-editable:hover { background-color: rgba(255, 255, 255, 0.1); }
 .summary-textarea { width: 100%; min-height: 150px; margin-top: 10px; padding: 15px; font-family: 'Nunito', sans-serif; font-size: 1.2rem; line-height: 1.7; color: var(--font-color); background-color: rgba(0,0,0,0.2); border: 1px solid var(--primary-accent); border-radius: 10px; resize: vertical; }
