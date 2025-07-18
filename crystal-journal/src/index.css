@@ -302,6 +302,76 @@ body {
     transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
+/* --- Loader --- */
+.loader-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    background-color: rgba(0, 0, 0, 0.5); /* A nice backdrop */
+    z-index: 999; /* Ensures it's on top of everything */
+}
+
+.loader-crystal {
+    font-size: 50px;
+    animation: pulse 2s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.7;
+    }
+}
+.crystal-button:visited {
+    color: var(--font-color);
+    text-decoration: none; /* Remove underline for visited links */
+}
+.crystal-button:focus {
+    outline: 2px solid var(--secondary-accent);
+    box-shadow: 0 0 10px rgba(139, 233, 253, 0.5);
+}
+.crystal-button:active {
+    transform: scale(0.95);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+.crystal-button:disabled {
+    background-color: rgba(255, 255, 255, 0.2);
+    cursor: not-allowed;
+    box-shadow: none;
+    color: rgba(255, 255, 255, 0.5);
+}
+.crystal-button:disabled:hover {
+    transform: none; /* Prevent hover effects on disabled buttons */        
+}
+.crystal-button:disabled:focus {
+    outline: none; /* Remove focus outline for disabled buttons */
+}
+.crystal-button:disabled:active {
+    transform: none; /* Prevent active effects on disabled buttons */
+}
+.crystal-link {
+    color: #b7e4c7;
+    text-decoration: none; /* Remove underline for links */
+    transition: color 0.2s ease;
+}
+.crystal-link:hover {
+    color: var(--secondary-accent);
+    text-decoration: none; /* Add underline on hover */
+}
+.crystal-link:visited {
+    text-decoration: none;
+}
 /* --- Softer Glow Effect for Journal Cards --- */
 .journal-card {
     box-shadow: 0 2px 12px rgba(139, 233, 253, 0.06), 0 1px 4px rgba(233, 69, 96, 0.06);
@@ -359,98 +429,4 @@ body {
 }
 .journal-card .delete-button {
     pointer-events: auto;
-}
-.crystal-button:visited {
-    color: var(--font-color);
-    text-decoration: none; /* Remove underline for visited links */
-}
-.crystal-button:focus {
-    outline: 2px solid var(--secondary-accent);
-    box-shadow: 0 0 10px rgba(139, 233, 253, 0.5);
-}
-.crystal-button:active {
-    transform: scale(0.95);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-.crystal-button:disabled {
-    background-color: rgba(255, 255, 255, 0.2);
-    cursor: not-allowed;
-    box-shadow: none;
-    color: rgba(255, 255, 255, 0.5);
-}
-.crystal-button:disabled:hover {
-    transform: none; /* Prevent hover effects on disabled buttons */        
-}
-.crystal-button:disabled:focus {
-    outline: none; /* Remove focus outline for disabled buttons */
-}
-.crystal-button:disabled:active {
-    transform: none; /* Prevent active effects on disabled buttons */
-}
-.crystal-link {
-    color: #b7e4c7;
-    text-decoration: none; /* Remove underline for links */
-    transition: color 0.2s ease;
-}
-.crystal-link:hover {
-    color: var(--secondary-accent);
-    text-decoration: none; /* Add underline on hover */
-}
-.crystal-link:visited {
-    text-decoration: none;
-}
-.journal-card {
-    position: relative;
-    padding: 40px 20px;
-    text-decoration: none;
-    color: white;
-    border: 2px solid transparent;
-    box-shadow: 0 4px 24px rgba(139, 233, 253, 0.08), 0 1.5px 8px rgba(233, 69, 96, 0.08);
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
-    transition: box-shadow 0.4s cubic-bezier(.4,2,.3,1), border-color 0.3s;
-    
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    cursor: pointer; /* Makes it clear the whole card is clickable */
-    width: 100%;     /* Ensures it fills the grid/tile area */
-    height: 100%;    /* Ensures it fills the grid/tile area */
-}   
-.journal-card:hover .delete-button {
-    opacity: 1;
-    transform: scale(1.1);
-}
-.journal-card:visited {
-    color: white;
-    text-decoration: none; /* Remove underline for visited links */
-}
-.journal-card .delete-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    left: auto;
-    width: 30px;
-    height: 30px;
-    background-color: rgba(233, 69, 96, 0.8);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    font-weight: bold;      
-    z-index: 10;
-    transition: all 0.2s ease;
-    opacity: 0; /* Start hidden */
-}
-.journal-card a,
-.journal-card a:visited,
-.journal-card a:active,
-.journal-card a:hover {
-  color: white !important;
-  text-decoration: none !important;
 }
