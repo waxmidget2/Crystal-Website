@@ -107,6 +107,19 @@ export const themes = [
     }
   },
   {
+    name: "Warped Stripes",
+    bgClass: "bg-warped-stripes",
+    colors: {
+      '--bg-color': '#e5e5e5',
+      '--primary-accent': '#000000',
+      '--secondary-accent': '#808080',
+      '--font-color': '#000000',
+      '--font-color-muted': '#555555',
+      '--glass-bg': 'rgba(255, 255, 255, 0.6)',
+      '--glass-border': 'rgba(0, 0, 0, 0.2)',
+    }
+  },
+  {
     name: "Liquid Dream",
     bgClass: "bg-liquid-dream",
     colors: {

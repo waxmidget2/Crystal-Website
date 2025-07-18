@@ -201,6 +201,22 @@ body {
     background: radial-gradient(circle, var(--primary-accent) 0%, var(--secondary-accent) 50%, var(--bg-color) 100%);
     animation: swirl 20s ease-in-out infinite;
 }
+.bg-warped-stripes {
+    background-color: #e5e5e5;
+    background-image: repeating-linear-gradient(
+        45deg, 
+        #000 0, 
+        #000 20px, 
+        #e5e5e5 20px, 
+        #e5e5e5 40px
+    );
+    animation: warped-stripes-anim 10s linear infinite;
+}
+
+@keyframes warped-stripes-anim {
+    from { background-position: 0 0; }
+    to { background-position: 100px 50px; }
+}
 @keyframes swirl {
     0% { transform: rotate(0deg) scale(1); }
     50% { transform: rotate(180deg) scale(1.2); }
