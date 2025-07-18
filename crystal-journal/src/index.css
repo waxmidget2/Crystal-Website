@@ -109,9 +109,9 @@ body {
     background-size: 400% 400%;
     animation: gradient-flow 18s ease infinite;
 }
-/*lol*/
+
 .bg-enchanted-forest {
-    background: linear-gradient(-45deg, #081c15, #1b4532, #2d6a4f);
+    background: linear-gradient(-45deg, #081c15, #1b4332, #2d6a4f);
     background-size: 400% 400%;
     animation: gradient-flow 20s ease infinite;
 }
@@ -187,14 +187,16 @@ body {
 /* --- Journal Card (Lobby & List) - DEFINITIVE FIX --- */
 .journal-card {
   position: relative;
-  display: grid;
-  place-items: center;
-  padding: 40px 20px;
-  text-align: center;
   transition: all 0.3s ease;
 }
 .journal-card:hover { transform: translateY(-5px); border-color: var(--secondary-accent); background: rgba(139, 233, 253, 0.1); }
 .journal-card-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 40px 20px;
   text-decoration: none;
   color: inherit;
 }
@@ -271,22 +273,13 @@ body {
     0%, 100% { transform: scale(1); opacity: 1; }
     50% { transform: scale(1.1); opacity: 0.7; }
 }
-.back-button {
+.loader-text {
+    font-size: 24px;
     color: var(--font-color);
-    font-size: 1.2rem;
-    text-decoration: none;
-    margin-bottom: 20px;
-    transition: color 0.2s ease;
+    text-align: center;
+    animation: fadeIn 1.5s ease-in-out;
 }
-.back-button:hover {
-    color: var(--secondary-accent);
-}
-.back-button:visited {
-    color: var(--font-color-muted);
-}
-.back-button:active {
-    color: var(--primary-accent);
-}
-.back-button:hover, .back-button:visited, .back-button:active {
-    text-decoration: none;
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
