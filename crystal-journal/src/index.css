@@ -225,6 +225,19 @@ body {
 .back-button:hover {
   text-decoration: none;
 }
+/* Center loading screen */
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  background: rgba(40, 42, 54, 0.85); /* Optional: semi-transparent overlay */
+}
 .back-button { align-self: flex-start; margin: 10px; border: none; background: none; color: var(--font-color-muted); font-size: 1.2rem; cursor: pointer; transition: color 0.2s ease; }
 .crystal-page-layout { display: grid; grid-template-columns:repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; width: 100%; height: auto; }
 .crystal-summary-sidebar, .journal-area { padding: 30px; min-height: 60vh; }
