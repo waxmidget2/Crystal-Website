@@ -28,7 +28,7 @@ export default function Navbar({ user, onThemeClick, toggleRainbowMode }) {
             onClick={onThemeClick}
             title="Change Theme"
           >
-            🎨
+            ✨ 
           </button>
         )}
       </div>
