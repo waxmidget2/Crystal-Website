@@ -187,6 +187,10 @@ body {
 /* --- Journal Card (Lobby & List) - DEFINITIVE FIX --- */
 .journal-card {
   position: relative;
+  padding: 20px;
+    border-radius: var(--border-radius-main);
+    background: var(--glass-bg);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
   transition: all 0.3s ease;
 }
 .journal-card:hover { transform: translateY(-5px); border-color: var(--secondary-accent); background: rgba(139, 233, 253, 0.1); }
