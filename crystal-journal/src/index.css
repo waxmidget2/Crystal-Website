@@ -188,7 +188,24 @@ body {
     background-position: 0% 50%;
   }
 }
-
+.bg-liquid-dream {
+    overflow: hidden;
+}
+.bg-liquid-dream:before {
+    content: '';
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    top: -50%;
+    left: -50%;
+    background: radial-gradient(circle, var(--primary-accent) 0%, var(--secondary-accent) 50%, var(--bg-color) 100%);
+    animation: swirl 20s ease-in-out infinite;
+}
+@keyframes swirl {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.2); }
+    100% { transform: rotate(360deg) scale(1); }
+}
 .bg-plain { background: var(--bg-color); }
 
 @keyframes rainbow-text { 0% { color: #ff5555; } 17% { color: #ffb86c; } 34% { color: #f1fa8c; } 51% { color: #50fa7b; } 68% { color: #8be9fd; } 85% { color: #bd93f9; } 100% { color: #ff79c6; } }

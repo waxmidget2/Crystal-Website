@@ -105,5 +105,18 @@ export const themes = [
       '--glass-bg': 'rgba(26, 26, 46, 0.6)',
       '--glass-border': 'rgba(0, 245, 212, 0.3)',
     }
+  },
+  {
+    name: "Liquid Dream",
+    bgClass: "bg-liquid-dream",
+    colors: {
+      '--bg-color': '#4a00e0',
+      '--primary-accent': '#fc00ff',
+      '--secondary-accent': '#00dbde',
+      '--font-color': '#ffffff',
+      '--font-color-muted': '#e0c3fc',
+      '--glass-bg': 'rgba(74, 0, 224, 0.3)',
+      '--glass-border': 'rgba(252, 0, 255, 0.4)',
+    }
   }
 ];
