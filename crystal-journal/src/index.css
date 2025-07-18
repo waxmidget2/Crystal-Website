@@ -305,3 +305,51 @@ body {
         opacity: 0.7;
     }
 }
+.crystal-button:visited {
+    color: var(--font-color);
+    text-decoration: none; /* Remove underline for visited links */
+}
+.crystal-button:focus {
+    outline: 2px solid var(--secondary-accent);
+    box-shadow: 0 0 10px rgba(139, 233, 253, 0.5);
+}
+.crystal-button:active {
+    transform: scale(0.95);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+.crystal-button:disabled {
+    background-color: rgba(255, 255, 255, 0.2);
+    cursor: not-allowed;
+    box-shadow: none;
+    color: rgba(255, 255, 255, 0.5);
+}
+.crystal-button:disabled:hover {
+    transform: none; /* Prevent hover effects on disabled buttons */        
+}
+.crystal-button:disabled:focus {
+    outline: none; /* Remove focus outline for disabled buttons */
+}
+.crystal-button:disabled:active {
+    transform: none; /* Prevent active effects on disabled buttons */
+}
+.journal-card .delete-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    left: auto;
+    width: 30px;
+    height: 30px;
+    background-color: rgba(233, 69, 96, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: bold;      
+    z-index: 10;
+    transition: all 0.2s ease;
+    opacity: 0; /* Start hidden */
+}
