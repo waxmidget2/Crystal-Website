@@ -212,7 +212,22 @@ body {
 .crystal-button-label { position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px 15px; text-align: center; font-weight: 700; font-size: 1.2rem; color: white; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); transition: all 0.3s ease; }
 
 /* --- Journal Card (Lobby & List) --- */
-.journal-card { padding: 40px 20px; text-decoration: none; color: var(--font-color); transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; text-align: center; }
+.journal-card { 
+    position: relative;
+    padding: 40px 20px;
+    text-decoration: none;
+    color: white;
+    border: 2px solid transparent;
+    
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer; /* Makes it clear the whole card is clickable */
+    width: 100%;     /* Ensures it fills the grid/tile area */
+    height: 100%;    /* Ensures it fills the grid/tile area */
+}
 .journal-card:hover { transform: translateY(-5px); border-color: var(--secondary-accent); background: rgba(139, 233, 253, 0.1); }
 .journal-card button { position: relative; z-index: 2; }
 
@@ -355,25 +370,9 @@ body {
     align-items: center;
     justify-content: center;
     text-align: center;
-}
-.journal-card {
-    color: white;
-    text-decoration: none;
-}
-.journal-card:visited,
-.journal-card:active,
-.journal-card:hover {
-    color: white;
-    text-decoration: none;
-}
-.journal-card:hover {
-    transform: translateY(-5px);
-    border-color: var(--secondary-accent);
-    background: rgba(139, 233, 253, 0.1);
-}
-.journal-card button {
-    position: relative;
-    z-index: 2;
+    cursor: pointer; /* Makes it clear the whole card is clickable */
+    width: 100%;     /* Ensures it fills the grid/tile area */
+    height: 100%;    /* Ensures it fills the grid/tile area */
 }   
 .journal-card:hover .delete-button {
     opacity: 1;
