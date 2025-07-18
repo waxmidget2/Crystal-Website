@@ -372,23 +372,33 @@ body {
 .crystal-link:visited {
     text-decoration: none;
 }
-/* --- Softer Glow Effect for Journal Cards --- */
 .journal-card {
-    box-shadow: 0 2px 12px rgba(139, 233, 253, 0.06), 0 1px 4px rgba(233, 69, 96, 0.06);
+    position: relative;
+    padding: 40px 20px;
+    text-decoration: none;
+    color: white;
+    border: 2px solid transparent;
+    box-shadow: 0 4px 24px rgba(139, 233, 253, 0.08), 0 1.5px 8px rgba(233, 69, 96, 0.08);
     backdrop-filter: blur(2px);
     -webkit-backdrop-filter: blur(2px);
     transition: box-shadow 0.4s cubic-bezier(.4,2,.3,1), border-color 0.3s;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer; /* Makes it clear the whole card is clickable */
+    width: 100%;     /* Ensures it fills the grid/tile area */
+    height: 100%;    /* Ensures it fills the grid/tile area */
+}   
+.journal-card:hover .delete-button {
+    opacity: 1;
+    transform: scale(1.1);
 }
-
-.journal-card:hover {
-    box-shadow: 0 0 16px 4px var(--secondary-accent), 0 2px 16px rgba(233, 69, 96, 0.10);
-    border-color: var(--primary-accent);
-    background: rgba(139, 233, 253, 0.08);
-    filter: brightness(1.04) saturate(1.1);
-    transition: box-shadow 0.4s cubic-bezier(.4,2,.3,1), border-color 0.3s, filter 0.3s;
+.journal-card:visited {
+    color: white;
+    text-decoration: none; /* Remove underline for visited links */
 }
-
-/* --- Make the delete button area actually clickable --- */
 .journal-card .delete-button {
     pointer-events: auto;
     opacity: 0;
@@ -410,17 +420,12 @@ body {
     z-index: 10;
     transition: opacity 0.2s ease, transform 0.2s ease, background 0.2s;
 }
-
-.journal-card:hover .delete-button,
-.journal-card .delete-button:focus {
-    opacity: 1;
-    transform: scale(1.08);
-    background-color: #e94560;
-}
-
-.journal-card .delete-button:active {
-    background-color: #c82333;
-    transform: scale(0.95);
+.journal-card a,
+.journal-card a:visited,
+.journal-card a:active,
+.journal-card a:hover {
+  color: white !important;
+  text-decoration: none !important;
 }
 
 /* Ensure the delete button is above the clickable card area */
