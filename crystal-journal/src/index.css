@@ -31,21 +31,10 @@
 
 body {
     font-family: 'Nunito', sans-serif;
-    background-color: var(--bg-color);
+    background-color: var(--bg-color); /* This will be the fallback */
     color: var(--font-color);
     overflow-x: hidden;
     transition: background-color 0.5s ease;
-    /* Your custom wavy background */
-    background: linear-gradient(120deg, #23243a 0%, #2c2a4a 60%, #8be9fd 100%);
-    background-size: 200% 200%;
-    animation: wavy-teal-bg 12s ease-in-out infinite;
-    background-attachment: fixed;
-}
-
-@keyframes wavy-teal-bg {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
 }
 
 .App {
@@ -58,6 +47,14 @@ body {
 
 /* --- HOLOGRAM THEME STYLES --- */
 .bg-holo-projector {
+    /* Override root colors for a green cyberpunk theme */
+    --primary-accent: #00ff9d;
+    --secondary-accent: #00f5d4;
+    --font-color-muted: #00f5d4;
+    --glass-bg: rgba(0, 245, 212, 0.1);
+    --glass-border: rgba(0, 245, 212, 0.7);
+    
+    /* Background for the scene */
     background-image: 
         radial-gradient(ellipse at 50% 100%, rgba(2, 4, 27, 1) 0%, rgba(0,0,0,0) 60%),
         repeating-linear-gradient(0deg, rgba(0, 217, 255, 0.1) 0, rgba(0, 217, 255, 0.1) 1px, transparent 1px, transparent 20px);
@@ -77,7 +74,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0, 217, 255, 0.2) 50%, rgba(0,0,0,0) 100%);
+    background: linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0, 245, 212, 0.15) 50%, rgba(0,0,0,0) 100%);
     background-size: 100% 4px;
     animation: scanlines 10s linear infinite;
     z-index: 2;
@@ -93,7 +90,7 @@ body {
     height: 80vh;
     border: 2px solid var(--secondary-accent);
     border-radius: var(--border-radius-main);
-    background: radial-gradient(ellipse at center, rgba(0, 217, 255, 0.15) 0%, rgba(0,0,0,0) 70%);
+    background: radial-gradient(ellipse at center, rgba(0, 245, 212, 0.15) 0%, rgba(0,0,0,0) 70%);
     box-shadow: 0 0 15px var(--secondary-accent), 0 0 30px var(--secondary-accent), inset 0 0 10px var(--secondary-accent);
     transform-style: preserve-3d;
     transform: rotateX(var(--rotX)) rotateY(var(--rotY));
@@ -107,48 +104,35 @@ body {
 .bg-holo-projector + .App::-webkit-scrollbar-thumb { background-color: var(--secondary-accent); border-radius: 4px; }
 @keyframes holo-flicker {
     0%, 100% { opacity: 1; }
-    50% { opacity: 0.95; }
-    50.2% { opacity: 1; }
-    75% { opacity: 0.98; }
-    75.2% { opacity: 1; }
+    50% { opacity: 0.95; } 50.2% { opacity: 1; }
+    75% { opacity: 0.98; } 75.2% { opacity: 1; }
 }
 .holo-projector {
     position: absolute;
-    bottom: 0;
-    width: 300px;
-    height: 100px;
+    bottom: 5vh; /* Raise it off the floor */
+    width: 250px;
+    height: 150px;
     transform-style: preserve-3d;
-    transform: rotateX(75deg);
+    transform: rotateX(65deg) translateZ(-50px); /* Angled up */
 }
 .projector-base {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: #111;
-    border: 2px solid var(--secondary-accent);
+    position: absolute; width: 100%; height: 100%;
+    background: #111; border: 2px solid var(--secondary-accent);
     box-shadow: 0 0 10px var(--secondary-accent);
-    transform: translateZ(-50px);
+    transform: translateZ(-75px);
 }
 .projector-base::before, .projector-base::after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 50px;
-    background: #222;
-    border-left: 2px solid var(--secondary-accent);
+    content: ''; position: absolute; width: 100%; height: 75px;
+    background: #222; border-left: 2px solid var(--secondary-accent);
     border-right: 2px solid var(--secondary-accent);
 }
-.projector-base::before { transform: rotateX(90deg) translateZ(25px); }
-.projector-base::after { transform: rotateX(-90deg) translateZ(75px); border-bottom: 2px solid var(--secondary-accent); }
+.projector-base::before { transform: rotateX(90deg) translateZ(37.5px); }
+.projector-base::after { transform: rotateX(-90deg) translateZ(112.5px); border-bottom: 2px solid var(--secondary-accent); }
 .projector-light {
-    position: absolute;
-    width: 50px;
-    height: 50px;
-    top: 50%;
-    left: 50%;
+    position: absolute; width: 50px; height: 50px;
+    top: 50%; left: 50%;
     transform: translate(-50%, -50%) translateZ(1px);
-    background: var(--secondary-accent);
-    border-radius: 50%;
+    background: var(--secondary-accent); border-radius: 50%;
     box-shadow: 0 0 20px var(--secondary-accent), 0 0 40px var(--secondary-accent), 0 0 60px white;
     animation: pulse-light 3s infinite;
 }
@@ -156,6 +140,50 @@ body {
     0%, 100% { transform: translate(-50%, -50%) translateZ(1px) scale(1); }
     50% { transform: translate(-50%, -50%) translateZ(1px) scale(1.1); }
 }
+
+/* --- New Cyberpunk Scene Furniture --- */
+.cyberpunk-desk {
+    position: absolute;
+    bottom: 0;
+    left: 5%;
+    width: 300px;
+    height: 150px;
+    transform-style: preserve-3d;
+    transform: rotateX(75deg) rotateY(20deg) translateZ(-100px);
+}
+.desk-top {
+    position: absolute; width: 100%; height: 100%;
+    background: #222; border: 1px solid var(--primary-accent);
+    transform: translateZ(75px);
+}
+.desk-leg {
+    position: absolute; top: 0; width: 20px; height: 100%;
+    background: #111; border: 1px solid var(--primary-accent);
+}
+.desk-leg.front-left { left: 5px; transform: rotateY(90deg) translateZ(10px); }
+.desk-leg.front-right { right: 5px; transform: rotateY(90deg) translateZ(-290px); }
+
+.cyberpunk-computer {
+    position: absolute;
+    width: 100px; height: 70px;
+    transform-style: preserve-3d;
+    transform: translateZ(76px); /* Sit on top of the desk */
+}
+.computer-screen {
+    position: absolute; width: 100%; height: 100%;
+    background: var(--secondary-accent);
+    box-shadow: inset 0 0 10px #000;
+    transform: rotateX(-15deg) translateZ(5px);
+    animation: screen-glitch 8s infinite steps(1);
+}
+@keyframes screen-glitch {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+    50.2% { opacity: 1; }
+    60% { background: var(--primary-accent); }
+    60.2% { background: var(--secondary-accent); }
+}
+
 .bg-holo-projector ~ .App .glass-ui, .bg-holo-projector .glass-ui {
     font-family: 'Orbitron', sans-serif;
     border-radius: 0;
@@ -168,81 +196,17 @@ body {
 }
 
 /* --- Other Animated Backgrounds --- */
-.background-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    transition: opacity 0.5s ease-in-out;
-    background-color: var(--bg-color);
-}
-.bg-starry-night {
-    background-image:
-        radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
-        radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px);
-    background-size: 550px 550px, 350px 350px;
-    background-position: 0 0, 40px 60px;
-    animation: shimmer 15s linear infinite;
-}
-@keyframes shimmer {
-    from { background-position: 0 0, 40px 60px; }
-    to { background-position: -550px -550px, -350px -350px; }
-}
-.bg-galaxy {
-    background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
-    overflow: hidden;
-}
-.bg-galaxy:after, .bg-galaxy:before {
-    content: '';
-    position: absolute;
-    width: 2px;
-    height: 2px;
-    background: white;
-    box-shadow: 
-        600px 800px #fff, 300px 900px #fff, 200px 1150px #fff, 
-        800px 1300px #fff, 1400px 1400px #fff, 1600px 1000px #fff;
-    animation: anim-star 100s linear infinite;
-}
+.bg-starry-night { background-image: radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px), radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px); background-size: 550px 550px, 350px 350px; background-position: 0 0, 40px 60px; animation: shimmer 15s linear infinite; }
+@keyframes shimmer { from { background-position: 0 0, 40px 60px; } to { background-position: -550px -550px, -350px -350px; } }
+.bg-galaxy { background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%); overflow: hidden; }
+.bg-galaxy:after, .bg-galaxy:before { content: ''; position: absolute; width: 2px; height: 2px; background: white; box-shadow: 600px 800px #fff, 300px 900px #fff, 200px 1150px #fff, 800px 1300px #fff, 1400px 1400px #fff, 1600px 1000px #fff; animation: anim-star 100s linear infinite; }
 .bg-galaxy:before { transform: rotate(45deg); }
-@keyframes anim-star {
-    from { transform: translateY(0px); }
-    to { transform: translateY(-2000px); }
-}
-.bg-liquid-dream {
-    overflow: hidden;
-}
-.bg-liquid-dream:before {
-    content: '';
-    position: absolute;
-    width: 200%;
-    height: 200%;
-    top: -50%;
-    left: -50%;
-    background: radial-gradient(circle, var(--primary-accent) 0%, var(--secondary-accent) 50%, var(--bg-color) 100%);
-    animation: swirl 20s ease-in-out infinite;
-}
-@keyframes swirl {
-    0% { transform: rotate(0deg) scale(1); }
-    50% { transform: rotate(180deg) scale(1.2); }
-    100% { transform: rotate(360deg) scale(1); }
-}
-.bg-warped-stripes {
-    background-color: #e5e5e5;
-    background-image: repeating-linear-gradient(
-        45deg, 
-        #000 0, 
-        #000 20px, 
-        #e5e5e5 20px, 
-        #e5e5e5 40px
-    );
-    animation: warped-stripes-anim 10s linear infinite;
-}
-@keyframes warped-stripes-anim {
-    from { background-position: 0 0; }
-    to { background-position: 100px 50px; }
-}
+@keyframes anim-star { from { transform: translateY(0px); } to { transform: translateY(-2000px); } }
+.bg-liquid-dream { overflow: hidden; }
+.bg-liquid-dream:before { content: ''; position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; background: radial-gradient(circle, var(--primary-accent) 0%, var(--secondary-accent) 50%, var(--bg-color) 100%); animation: swirl 20s ease-in-out infinite; }
+@keyframes swirl { 0% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(180deg) scale(1.2); } 100% { transform: rotate(360deg) scale(1); } }
+.bg-warped-stripes { background-color: #e5e5e5; background-image: repeating-linear-gradient(45deg, #000 0, #000 20px, #e5e5e5 20px, #e5e5e5 40px); animation: warped-stripes-anim 10s linear infinite; }
+@keyframes warped-stripes-anim { from { background-position: 0 0; } to { background-position: 100px 50px; } }
 .bg-plain { background: var(--bg-color); }
 @keyframes rainbow-text { 0% { color: #ff5555; } 17% { color: #ffb86c; } 34% { color: #f1fa8c; } 51% { color: #50fa7b; } 68% { color: #8be9fd; } 85% { color: #bd93f9; } 100% { color: #ff79c6; } }
 
@@ -329,12 +293,3 @@ body {
 .loader-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 20px; background-color: rgba(0, 0, 0, 0.5); z-index: 999; }
 .loader-crystal { font-size: 50px; animation: pulse 2s infinite ease-in-out; }
 @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } }
-@media (max-width: 768px) {
-    .navbar { flex-direction: column; align-items: flex-start; }
-    .navbar-title { font-size: 1.5rem; }
-    .journal-page-header { flex-direction: column; align-items: flex-start; }
-    .journal-title-section h1 { font-size: 2rem; }
-    .action-button { width: 100%; }
-    .bg-holo-projector + .App { height: 100vh; padding: 20px; }
-    .hologram-wrapper { height: 60vh; }
-}
