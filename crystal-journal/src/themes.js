@@ -120,6 +120,19 @@ export const themes = [
     }
   },
   {
+    name: "Mandelbrot Swirl",
+    bgClass: "bg-mandelbrot-swirl",
+    colors: {
+      '--bg-color': '#000000',
+      '--primary-accent': '#ffffff',
+      '--secondary-accent': '#aaaaaa',
+      '--font-color': '#ffffff',
+      '--font-color-muted': '#cccccc',
+      '--glass-bg': 'rgba(255, 255, 255, 0.1)',
+      '--glass-border': 'rgba(255, 255, 255, 0.5)',
+    }
+  },
+  {
     name: "Warped Stripes",
     bgClass: "bg-warped-stripes",
     colors: {
