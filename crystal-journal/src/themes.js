@@ -105,6 +105,19 @@ export const themes = [
       '--glass-bg': 'rgba(26, 26, 46, 0.6)',
       '--glass-border': 'rgba(0, 245, 212, 0.3)',
     }
+  },  
+  {
+    name: "Holo-Projector",
+    bgClass: "bg-holo-projector", // This class will activate the entire effect
+    colors: {
+      '--bg-color': '#02041b',
+      '--primary-accent': '#ff00e5', // Magenta
+      '--secondary-accent': '#00d9ff', // Cyan
+      '--font-color': '#e5e5e5',
+      '--font-color-muted': '#00d9ff',
+      '--glass-bg': 'rgba(0, 217, 255, 0.1)',
+      '--glass-border': 'rgba(0, 217, 255, 0.7)',
+    }
   },
   {
     name: "Warped Stripes",
