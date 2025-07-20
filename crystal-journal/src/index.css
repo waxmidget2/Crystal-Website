@@ -29,12 +29,15 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+html, body {
+    height: 100%;
+}
 body {
     font-family: 'Nunito', sans-serif;
     background-color: var(--bg-color); /* This will be the fallback */
     color: var(--font-color);
-    overflow-y: auto;
     overflow-x: hidden;
+    overflow-y: auto;
     transition: background-color 0.5s ease;
 }
 
