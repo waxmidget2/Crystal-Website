@@ -673,7 +673,7 @@ body {
 .modal-content {
     overflow-y: auto !important;
     overflow-x: hidden !important;
-    max-height: 80vh;
+    max-height: 400vh;
     scrollbar-width: thin;
     scrollbar-color: var(--secondary-accent) var(--glass-bg);
     border-radius: var(--border-radius-main);
@@ -708,6 +708,39 @@ body {
 .journal-area::-webkit-scrollbar-track,
 .crystal-summary-sidebar::-webkit-scrollbar-track,
 .modal-content::-webkit-scrollbar-track {
+    background: var(--glass-bg);
+    border-radius: 10px;
+}
+
+/* Make the grid area scrollable with beautiful scrollbars */
+// filepath: /workspaces/Crystal-Website/crystal-journal/src/index.css
+
+.home-grid,
+.journal-grid {
+    max-height: 60vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: 20px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--secondary-accent) var(--glass-bg);
+    border-radius: var(--border-radius-main);
+}
+
+/* Chrome, Edge, Safari scrollbar styles */
+.home-grid::-webkit-scrollbar,
+.journal-grid::-webkit-scrollbar {
+    width: 10px;
+    background: var(--glass-bg);
+    border-radius: var(--border-radius-main);
+}
+.home-grid::-webkit-scrollbar-thumb,
+.journal-grid::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--secondary-accent), var(--primary-accent));
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.home-grid::-webkit-scrollbar-track,
+.journal-grid::-webkit-scrollbar-track {
     background: var(--glass-bg);
     border-radius: 10px;
 }
