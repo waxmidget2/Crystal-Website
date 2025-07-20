@@ -29,13 +29,19 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+html {
+    height: 100%;
+}
+
 body {
     font-family: 'Nunito', sans-serif;
-    background-color: var(--bg-color); /* This will be the fallback */
+    background-color: var(--bg-color);
     color: var(--font-color);
     overflow-x: hidden;
-    overflow-y: auto;
+    /* THE FIX: The body is the only element that should control the main scrollbar */
+    overflow-y: auto; 
     transition: background-color 0.5s ease;
+    min-height: 100%;
 }
 
 body::-webkit-scrollbar {
@@ -57,47 +63,33 @@ body::-webkit-scrollbar-thumb {
 
 /* --- HOLOGRAM THEME STYLES --- */
 .bg-holo-projector {
-    /* Override root colors for a green cyberpunk theme */
     --primary-accent: #00ff9d;
     --secondary-accent: #00f5d4;
     --font-color-muted: #00f5d4;
     --glass-bg: rgba(0, 245, 212, 0.1);
     --glass-border: rgba(0, 245, 212, 0.7);
-    
-    /* Background for the scene */
     background-image: 
         radial-gradient(ellipse at 50% 100%, rgba(2, 4, 27, 1) 0%, rgba(0,0,0,0) 60%),
         repeating-linear-gradient(0deg, rgba(0, 217, 255, 0.1) 0, rgba(0, 217, 255, 0.1) 1px, transparent 1px, transparent 20px);
 }
 .hologram-wrapper {
     width: 100%;
-    height: 100vh;
+    /* THE FIX: Height is now 'auto' with a min-height, allowing it to grow */
+    min-height: 100vh;
+    height: auto;
     display: flex;
     justify-content: center;
     align-items: center;
     perspective: 1500px;
-    overflow: hidden;
+    /* THE FIX: Overflow is removed to allow scrolling */
 }
-.holo-scanlines {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0, 245, 212, 0.15) 50%, rgba(0,0,0,0) 100%);
-    background-size: 100% 4px;
-    animation: scanlines 10s linear infinite;
-    z-index: 2;
-    pointer-events: none;
-}
-@keyframes scanlines {
-    from { background-position: 0 0; }
-    to { background-position: 0 100px; }
-}
+.holo-scanlines { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(0, 245, 212, 0.15) 50%, rgba(0,0,0,0) 100%); background-size: 100% 4px; animation: scanlines 10s linear infinite; z-index: 2; pointer-events: none; }
+@keyframes scanlines { from { background-position: 0 0; } to { background-position: 0 100px; } }
 .bg-holo-projector + .App {
     width: 100%;
     max-width: 1200px;
-    height: 80vh;
+    height: auto; /* THE FIX: Height must be auto to allow content to define it */
+    min-height: 80vh;
     border: 2px solid var(--secondary-accent);
     border-radius: var(--border-radius-main);
     background: radial-gradient(ellipse at center, rgba(0, 245, 212, 0.15) 0%, rgba(0,0,0,0) 70%);
@@ -106,266 +98,51 @@ body::-webkit-scrollbar-thumb {
     transform: rotateX(var(--rotX)) rotateY(var(--rotY));
     transition: transform 0.1s ease-out;
     animation: holo-flicker 15s infinite;
-    overflow-y: auto;
+    overflow: visible; /* THE FIX: The app itself should not scroll */
     padding: 30px;
 }
-.bg-holo-projector + .App::-webkit-scrollbar { width: 8px; }
-.bg-holo-projector + .App::-webkit-scrollbar-track { background: transparent; }
-.bg-holo-projector + .App::-webkit-scrollbar-thumb { background-color: var(--secondary-accent); border-radius: 4px; }
-@keyframes holo-flicker {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.95; } 50.2% { opacity: 1; }
-    75% { opacity: 0.98; } 75.2% { opacity: 1; }
-}
-.holo-projector {
-    position: absolute;
-    bottom: 5vh; /* Raise it off the floor */
-    width: 250px;
-    height: 150px;
-    transform-style: preserve-3d;
-    transform: rotateX(65deg) translateZ(-50px); /* Angled up */
-}
-.projector-base {
-    position: absolute; width: 100%; height: 100%;
-    background: #111; border: 2px solid var(--secondary-accent);
-    box-shadow: 0 0 10px var(--secondary-accent);
-    transform: translateZ(-75px);
-}
-.projector-base::before, .projector-base::after {
-    content: ''; position: absolute; width: 100%; height: 75px;
-    background: #222; border-left: 2px solid var(--secondary-accent);
-    border-right: 2px solid var(--secondary-accent);
-}
+@keyframes holo-flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.95; } 50.2% { opacity: 1; } 75% { opacity: 0.98; } 75.2% { opacity: 1; } }
+.holo-projector { position: absolute; bottom: 5vh; width: 250px; height: 150px; transform-style: preserve-3d; transform: rotateX(65deg) translateZ(-50px); }
+.projector-base { position: absolute; width: 100%; height: 100%; background: #111; border: 2px solid var(--secondary-accent); box-shadow: 0 0 10px var(--secondary-accent); transform: translateZ(-75px); }
+.projector-base::before, .projector-base::after { content: ''; position: absolute; width: 100%; height: 75px; background: #222; border-left: 2px solid var(--secondary-accent); border-right: 2px solid var(--secondary-accent); }
 .projector-base::before { transform: rotateX(90deg) translateZ(37.5px); }
 .projector-base::after { transform: rotateX(-90deg) translateZ(112.5px); border-bottom: 2px solid var(--secondary-accent); }
-.projector-light {
-    position: absolute; width: 50px; height: 50px;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%) translateZ(1px);
-    background: var(--secondary-accent); border-radius: 50%;
-    box-shadow: 0 0 20px var(--secondary-accent), 0 0 40px var(--secondary-accent), 0 0 60px white;
-    animation: pulse-light 3s infinite;
-}
-@keyframes pulse-light {
-    0%, 100% { transform: translate(-50%, -50%) translateZ(1px) scale(1); }
-    50% { transform: translate(-50%, -50%) translateZ(1px) scale(1.1); }
-}
-
-/* --- New Cyberpunk Scene Furniture --- */
-.cyberpunk-desk {
-    position: absolute;
-    bottom: 0;
-    left: 5%;
-    width: 300px;
-    height: 150px;
-    transform-style: preserve-3d;
-    transform: rotateX(75deg) rotateY(20deg) translateZ(-100px);
-}
-.desk-top {
-    position: absolute; width: 100%; height: 100%;
-    background: #222; border: 1px solid var(--primary-accent);
-    transform: translateZ(75px);
-}
-.desk-leg {
-    position: absolute; top: 0; width: 20px; height: 100%;
-    background: #111; border: 1px solid var(--primary-accent);
-}
+.projector-light { position: absolute; width: 50px; height: 50px; top: 50%; left: 50%; transform: translate(-50%, -50%) translateZ(1px); background: var(--secondary-accent); border-radius: 50%; box-shadow: 0 0 20px var(--secondary-accent), 0 0 40px var(--secondary-accent), 0 0 60px white; animation: pulse-light 3s infinite; }
+@keyframes pulse-light { 0%, 100% { transform: translate(-50%, -50%) translateZ(1px) scale(1); } 50% { transform: translate(-50%, -50%) translateZ(1px) scale(1.1); } }
+.cyberpunk-desk { position: absolute; bottom: 0; left: 5%; width: 300px; height: 150px; transform-style: preserve-3d; transform: rotateX(75deg) rotateY(20deg) translateZ(-100px); }
+.desk-top { position: absolute; width: 100%; height: 100%; background: #222; border: 1px solid var(--primary-accent); transform: translateZ(75px); }
+.desk-leg { position: absolute; top: 0; width: 20px; height: 100%; background: #111; border: 1px solid var(--primary-accent); }
 .desk-leg.front-left { left: 5px; transform: rotateY(90deg) translateZ(10px); }
 .desk-leg.front-right { right: 5px; transform: rotateY(90deg) translateZ(-290px); }
+.cyberpunk-computer { position: absolute; width: 100px; height: 70px; transform-style: preserve-3d; transform: translateZ(76px); }
+.computer-screen { position: absolute; width: 100%; height: 100%; background: var(--secondary-accent); box-shadow: inset 0 0 10px #000; transform: rotateX(-15deg) translateZ(5px); animation: screen-glitch 8s infinite steps(1); }
+@keyframes screen-glitch { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } 50.2% { opacity: 1; } 60% { background: var(--primary-accent); } 60.2% { background: var(--secondary-accent); } }
+.bg-holo-projector ~ .App .glass-ui, .bg-holo-projector .glass-ui { font-family: 'Orbitron', sans-serif; border-radius: 0; clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%); text-shadow: 0 0 5px var(--secondary-accent); }
+.bg-holo-projector ~ .App .action-button, .bg-holo-projector .action-button { border-radius: 0; clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px)); }
 
-.cyberpunk-computer {
-    position: absolute;
-    width: 100px; height: 70px;
-    transform-style: preserve-3d;
-    transform: translateZ(76px); /* Sit on top of the desk */
-}
-.computer-screen {
-    position: absolute; width: 100%; height: 100%;
-    background: var(--secondary-accent);
-    box-shadow: inset 0 0 10px #000;
-    transform: rotateX(-15deg) translateZ(5px);
-    animation: screen-glitch 8s infinite steps(1);
-}
-@keyframes screen-glitch {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.8; }
-    50.2% { opacity: 1; }
-    60% { background: var(--primary-accent); }
-    60.2% { background: var(--secondary-accent); }
-}
-/* --- Animated Backgrounds --- */
-.background-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    transition: opacity 0.5s ease-in-out;
-    background-color: var(--bg-color);
-}
-
-.bg-starry-night {
-    background-image:
-        radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
-        radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px);
-    background-size: 550px 550px, 350px 350px;
-    background-position: 0 0, 40px 60px;
-    animation: shimmer 15s linear infinite;
-}
-@keyframes shimmer {
-    from { background-position: 0 0, 40px 60px; }
-    to { background-position: -550px -550px, -350px -350px; }
-}
-
-.bg-galaxy {
-    background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
-    overflow: hidden;
-}
-.bg-galaxy:after, .bg-galaxy:before {
-    content: '';
-    position: absolute;
-    width: 2px;
-    height: 2px;
-    background: white;
-    box-shadow: 
-        600px 800px #fff, 300px 900px #fff, 200px 1150px #fff, 
-        800px 1300px #fff, 1400px 1400px #fff, 1600px 1000px #fff;
-    animation: anim-star 100s linear infinite;
-}
+/* --- Other Animated Backgrounds --- */
+.background-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; transition: opacity 0.5s ease-in-out; background-color: var(--bg-color); }
+.bg-starry-night { background-image: radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px), radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px); background-size: 550px 550px, 350px 350px; background-position: 0 0, 40px 60px; animation: shimmer 15s linear infinite; }
+@keyframes shimmer { from { background-position: 0 0, 40px 60px; } to { background-position: -550px -550px, -350px -350px; } }
+.bg-galaxy { background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%); overflow: hidden; }
+.bg-galaxy:after, .bg-galaxy:before { content: ''; position: absolute; width: 2px; height: 2px; background: white; box-shadow: 600px 800px #fff, 300px 900px #fff, 200px 1150px #fff, 800px 1300px #fff, 1400px 1400px #fff, 1600px 1000px #fff; animation: anim-star 100s linear infinite; }
 .bg-galaxy:before { transform: rotate(45deg); }
-@keyframes anim-star {
-    from { transform: translateY(0px); }
-    to { transform: translateY(-2000px); }
-}
-
-.bg-ocean-waves {
-    background: radial-gradient(ellipse at top, var(--secondary-accent), transparent),
-                radial-gradient(ellipse at bottom, var(--primary-accent), transparent);
-    background-size: 100% 100%;
-    animation: waves 5s ease-in-out infinite;
-}
-@keyframes waves {
-    0% { background-position: 0 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0 50%; }
-}
-
-.bg-geometric-sunset {
-    background: 
-        linear-gradient(315deg, var(--primary-accent) 25%, transparent 25%) -50px 0,
-        linear-gradient(45deg, var(--primary-accent) 25%, transparent 25%) -50px 0,
-        linear-gradient(315deg, var(--secondary-accent) 10%, transparent 10%) 0 0,
-        linear-gradient(45deg, var(--secondary-accent) 10%, transparent 10%) 0 0;
-    background-size: 100px 100px;
-    animation: sunset-geo 8s linear infinite;
-}
-@keyframes sunset-geo {
-    from { background-position: -50px 0, -50px 0, 0 0, 0 0; }
-    to { background-position: 50px 0, 50px 0, -100px 0, -100px 0; }
-}
-
-.bg-fireflies {
-    overflow: hidden;
-}
-.bg-fireflies:before {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background-image: radial-gradient(circle, #b7e4c7 1px, transparent 1px);
-    background-size: 25px 25px;
-    animation: firefly-flicker 5s infinite;
-}
-@keyframes firefly-flicker {
-    0%, 100% { opacity: 0.2; }
-    50% { opacity: 0.8; }
-}
-
-.bg-synthwave-grid {
-    background-image: 
-        linear-gradient(var(--primary-accent) 2px, transparent 2px),
-        linear-gradient(90deg, var(--primary-accent) 2px, transparent 2px);
-    background-size: 100px 100px;
-    animation: synthwave-grid 5s linear infinite;
-}
-@keyframes synthwave-grid {
-    from { background-position: 0 0; }
-    to { background-position: 0 100px; }
-}
-
-.bg-pastel-stripes {
-  /* Trippy wavy black-and-white effect, but with red/pastel stripes */
-  background: repeating-linear-gradient(
-    120deg,
-    #ffafcc 0px 20px,
-    #ff5555 20px 40px,
-    #bde0fe 40px 60px,
-    #ffb86c 60px 80px,
-    #ffafcc 80px 100px,
-    #ff5555 100px 120px,
-    #bde0fe 120px 140px,
-    #ffb86c 140px 160px
-  );
-  background-size: 200% 200%;
-  animation: trippy-waves-anim 8s ease-in-out infinite;
-  filter: blur(0.5px) brightness(1.1) saturate(1.3) contrast(1.2);
-}
-
-@keyframes trippy-waves-anim {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-.bg-liquid-dream {
-    overflow: hidden;
-}
-.bg-liquid-dream:before {
-    content: '';
-    position: absolute;
-    width: 200%;
-    height: 200%;
-    top: -50%;
-    left: -50%;
-    background: radial-gradient(circle, var(--primary-accent) 0%, var(--secondary-accent) 50%, var(--bg-color) 100%);
-    animation: swirl 20s ease-in-out infinite;
-}
-.bg-warped-stripes {
-    background-color: #e5e5e5;
-    background-image: repeating-linear-gradient(
-        45deg, 
-        #000 0, 
-        #000 20px, 
-        #e5e5e5 20px, 
-        #e5e5e5 40px
-    );
-    animation: warped-stripes-anim 10s linear infinite;
-}
-
-@keyframes warped-stripes-anim {
-    from { background-position: 0 0; }
-    to { background-position: 100px 50px; }
-}
-@keyframes swirl {
-    0% { transform: rotate(0deg) scale(1); }
-    50% { transform: rotate(180deg) scale(1.2); }
-    100% { transform: rotate(360deg) scale(1); }
-}
+@keyframes anim-star { from { transform: translateY(0px); } to { transform: translateY(-2000px); } }
+.bg-liquid-dream { overflow: hidden; }
+.bg-liquid-dream:before { content: ''; position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; background: radial-gradient(circle, var(--primary-accent) 0%, var(--secondary-accent) 50%, var(--bg-color) 100%); animation: swirl 20s ease-in-out infinite; }
+@keyframes swirl { 0% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(180deg) scale(1.2); } 100% { transform: rotate(360deg) scale(1); } }
+.bg-warped-stripes { background-color: #e5e5e5; background-image: repeating-linear-gradient(45deg, #000 0, #000 20px, #e5e5e5 20px, #e5e5e5 40px); animation: warped-stripes-anim 10s linear infinite; }
+@keyframes warped-stripes-anim { from { background-position: 0 0; } to { background-position: 100px 50px; } }
+.bg-mandelbrot-swirl { background-color: #000; background-image: radial-gradient(circle at 20% 20%, #fff 1%, #000 5%, #fff 10%, #000 15%), radial-gradient(circle at 80% 30%, #fff 2%, #000 8%, #fff 15%, #000 20%), radial-gradient(circle at 70% 80%, #fff 3%, #000 7%, #fff 12%, #000 18%), radial-gradient(circle at 30% 70%, #fff 1%, #000 6%, #fff 13%, #000 19%); background-size: 200% 200%, 150% 150%, 180% 180%, 160% 160%; animation: mandelbrot-swirl-anim 25s linear infinite; }
+@keyframes mandelbrot-swirl-anim { from { transform: rotate(0deg); background-position: 0% 50%, 50% 100%, 100% 0%, 0% 0%; } to { transform: rotate(360deg); background-position: 100% 50%, 0% 0%, 50% 100%, 100% 100%; } }
 .bg-plain { background: var(--bg-color); }
-
 @keyframes rainbow-text { 0% { color: #ff5555; } 17% { color: #ffb86c; } 34% { color: #f1fa8c; } 51% { color: #50fa7b; } 68% { color: #8be9fd; } 85% { color: #bd93f9; } 100% { color: #ff79c6; } }
 
 /* --- Shared UI Components --- */
 .glass-ui { background: var(--glass-bg); border: 2px solid var(--glass-border); border-radius: var(--border-radius-main); backdrop-filter: blur(var(--backdrop-blur)); -webkit-backdrop-filter: blur(var(--backdrop-blur)); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); transition: all 0.3s ease; }
 .glass-ui:hover { border-color: var(--primary-accent); }
-.action-button { padding: 12px 28px; font-size: 1rem; font-weight: 700; color: var(--font-color); border: none; border-radius: var(--border-radius-main); cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease; /* Removed text-shadow */ }
-.action-button.primary { background-color: var(--primary-accent); color: #fff; /* Always white text for contrast */ }
+.action-button { padding: 12px 28px; font-size: 1rem; font-weight: 700; color: var(--font-color); border: none; border-radius: var(--border-radius-main); cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+.action-button.primary { background-color: var(--primary-accent); color: #fff; }
 .action-button.secondary { background-color: var(--secondary-accent); }
 .action-button:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 20px rgba(0,0,0, 0.3); }
 .action-button:disabled { background-color: #555; cursor: not-allowed; }
@@ -374,43 +151,16 @@ body::-webkit-scrollbar-thumb {
 .navbar { width: 100%; max-width: 1200px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding: 10px 20px; align-self: center; }
 .nav-left-group { display: flex; align-items: center; gap: 10px; }
 .navbar-title { font-size: 1.8rem; font-weight: 700; }
-.nav-button { background: none; border: none; font-size: 1.8rem; cursor: pointer; padding: 0 5px; transition: transform 0.3s ease-in-out; display: inline-block; text-decoration: none; /* Removed underline */ color: var(--font-color); }
+.nav-button { background: none; border: none; font-size: 1.8rem; cursor: pointer; padding: 0 5px; transition: transform 0.3s ease-in-out; display: inline-block; text-decoration: none; color: var(--font-color); }
 .nav-button:hover { transform: scale(1.2) rotate(15deg); }
 
 /* --- Journal & Item Pages --- */
 .login-prompt { text-align: center; padding: 50px; align-self: center; }
 .page-content-container { width: 100%; max-width: 1200px; display: flex; flex-direction: column; align-items: center; align-self: center; }
-.journal-area {
-    padding: 30px;
-}
-.page-content-container::-webkit-scrollbar,
-.journal-area::-webkit-scrollbar {
-    width: 8px;
-    background: transparent;
-}
-.page-content-container::-webkit-scrollbar-thumb,
-.journal-area::-webkit-scrollbar-thumb {
-    background: var(--secondary-accent);
-    border-radius: 8px;
-}
 .journal-page-header { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid var(--glass-border); gap: 20px; }
 .journal-title-section h1 { margin: 0; font-size: 2.5rem; color: var(--font-color); }
-
-/* --- Back Button --- */
-.back-to-journals-link, .back-button {
-    margin: 0;
-    padding: 8px 16px;
-    text-decoration: none;
-    color: var(--font-color-muted);
-    transition: all 0.2s ease;
-    border: none;
-    background: none;
-    border-radius: var(--border-radius-main);
-}
-.back-to-journals-link:hover, .back-button:hover {
-    color: var(--secondary-accent);
-    background-color: var(--glass-bg);
-}
+.back-to-journals-link, .back-button { margin: 0; padding: 8px 16px; text-decoration: none; color: var(--font-color-muted); transition: all 0.2s ease; border: none; background: none; border-radius: var(--border-radius-main); }
+.back-to-journals-link:hover, .back-button:hover { color: var(--secondary-accent); background-color: var(--glass-bg); }
 
 /* --- Grids (Journals and Items) --- */
 .journal-list-container { width: 100%; max-width: 900px; text-align: center; align-self: center; }
@@ -420,39 +170,16 @@ body::-webkit-scrollbar-thumb {
 /* --- Bubbly & Clean Item Card --- */
 .crystal-button { position: relative; height: 280px; border-radius: var(--border-radius-main); overflow: hidden; cursor: pointer; transition: all 0.4s ease; background-color: var(--glass-bg); box-shadow: 0 4px 15px rgba(0,0,0,0.2); border: 2px solid transparent; }
 .crystal-button:hover { transform: scale(1.05); box-shadow: 0 10px 30px rgba(0,0,0,0.4); border-color: var(--secondary-accent); }
+.crystal-link { color: white; text-decoration: none; width: 100%; height: 100%; display: block; }
 .crystal-button img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; background-color: rgba(0, 0, 0, 0.3); }
 .crystal-button:hover img { transform: scale(1.1); }
 .crystal-button-label { position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px 15px; text-align: center; font-weight: 700; font-size: 1.2rem; color: white; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); transition: all 0.3s ease; }
 
 /* --- Journal Card (Lobby & List) --- */
-.journal-card { 
-    position: relative;
-    padding: 40px 20px;
-    text-decoration: none;
-    color: white;
-    border: 2px solid transparent;
-    box-shadow: 0 4px 24px rgba(139, 233, 253, 0.08), 0 1.5px 8px rgba(233, 69, 96, 0.08);
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
-    transition: box-shadow 0.4s cubic-bezier(.4,2,.3,1), border-color 0.3s;
-    
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    cursor: pointer; /* Makes it clear the whole card is clickable */
-    width: 100%;     /* Ensures it fills the grid/tile area */
-    height: 100%;    /* Ensures it fills the grid/tile area */
-}
-.journal-card:hover { 
-    transform: translateY(-5px); 
-    border-color: var(--secondary-accent); 
-    background: rgba(139, 233, 253, 0.1);
-    box-shadow: 0 0 32px 8px var(--secondary-accent), 0 4px 32px rgba(233, 69, 96, 0.18);
-    filter: brightness(1.08) saturate(1.2);
-    transition: box-shadow 0.4s cubic-bezier(.4,2,.3,1), border-color 0.3s, filter 0.3s;
-}
+.journal-card { position: relative; padding: 40px 20px; text-decoration: none; color: white; border: 2px solid transparent; box-shadow: 0 4px 24px rgba(139, 233, 253, 0.08), 0 1.5px 8px rgba(233, 69, 96, 0.08); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); transition: box-shadow 0.4s cubic-bezier(.4,2,.3,1), border-color 0.3s; display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; width: 100%; height: 100%; }
+.journal-card:hover { transform: translateY(-5px); border-color: var(--secondary-accent); background: rgba(139, 233, 253, 0.1); box-shadow: 0 0 32px 8px var(--secondary-accent), 0 4px 32px rgba(233, 69, 96, 0.18); filter: brightness(1.08) saturate(1.2); transition: box-shadow 0.4s cubic-bezier(.4,2,.3,1), border-color 0.3s, filter 0.3s; }
 .journal-card button { position: relative; z-index: 2; }
+.journal-card a, .journal-card a:visited, .journal-card a:active, .journal-card a:hover { color: white !important; text-decoration: none !important; }
 
 /* --- Forms & Modals --- */
 .add-journal-form { display: flex; gap: 15px; padding: 20px; margin: 20px 0 40px 0; }
@@ -482,7 +209,6 @@ body::-webkit-scrollbar-thumb {
 .crystal-page-container { width: 100%; max-width: 1200px; display: flex; flex-direction: column; gap: 20px; align-self: center; }
 .crystal-page-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; width: 100%; }
 .crystal-summary-sidebar, .journal-area { padding: 30px; }
-
 .summary-image { width: 100%; max-width: 250px; height: 250px; object-fit: cover; border-radius: 50%; margin-bottom: 20px; border: 5px solid; box-shadow: 0 0 25px rgba(255,255,255,0.1); background-color: rgba(0,0,0,0.3); }
 .summary-title { font-size: 2.8rem; margin-bottom: 15px; font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.4); }
 .summary-text { font-size: 1.2rem; line-height: 1.7; color: var(--font-color-muted); white-space: pre-wrap; }
@@ -490,206 +216,10 @@ body::-webkit-scrollbar-thumb {
 .summary-text-editable:hover { background-color: rgba(255, 255, 255, 0.1); }
 .summary-textarea { width: 100%; min-height: 150px; margin-top: 10px; padding: 15px; font-family: 'Nunito', sans-serif; font-size: 1.2rem; line-height: 1.7; color: var(--font-color); background-color: rgba(0,0,0,0.2); border: 1px solid var(--primary-accent); border-radius: 10px; resize: vertical; }
 .summary-textarea:focus { outline: 2px solid var(--secondary-accent); }
-.journal-textarea { width: 100%; height: 100%; padding: 25px; color: var(--font-color); font-family: 'Nunito', sans-serif; font-size: 1.2rem; line-height: 1.7; resize: none; border: none; background: transparent; }
+.journal-textarea { width: 100%; min-height: 200px; padding: 25px; color: var(--font-color); font-family: 'Nunito', sans-serif; font-size: 1.2rem; line-height: 1.7; resize: vertical; border: none; background: transparent; }
 .journal-textarea:focus { outline: 2px solid var(--primary-accent); box-shadow: 0 0 20px rgba(233, 69, 96, 0.3); }
 .journal-textarea::placeholder { color: var(--font-color-muted); }
 .journal-login-prompt { display: flex; align-items: center; justify-content: center; text-align: center; height: 100%; flex-direction: column; gap: 15px; }
-.journal-login-prompt h2 { font-size: 1.8rem; color: var(--font-color); }
-.journal-login-prompt p { font-size: 1.2rem; color: var(--font-color-muted); }
-.journal-login-prompt button { padding: 12px 24px; font-size: 1.1rem; font-weight: 600; color: var(--font-color); background-color: var(--primary-accent); border: none; border-radius: var(--border-radius-main); cursor: pointer; transition: background-color 0.3s ease; }
-.journal-login-prompt button:hover { background-color: var(--secondary-accent); }       
-.journal-card .delete-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    left: auto;
-    /* keep your other styles here */
-}
-.journal-card:hover .delete-button {
-    opacity: 1;
-    transform: scale(1.1);
-}
-.journal-card .delete-button {
-    opacity: 0;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
-/* --- Loader --- */
-.loader-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    background-color: rgba(0, 0, 0, 0.5); /* A nice backdrop */
-    z-index: 999; /* Ensures it's on top of everything */
-}
-
-.loader-crystal {
-    font-size: 50px;
-    animation: pulse 2s infinite ease-in-out;
-}
-
-@keyframes pulse {
-    0%, 100% {
-        transform: scale(1);
-        opacity: 1;
-    }
-    50% {
-        transform: scale(1.1);
-        opacity: 0.7;
-    }
-}
-.crystal-button:visited {
-    color: var(--font-color);
-    text-decoration: none; /* Remove underline for visited links */
-}
-.crystal-button:focus {
-    outline: 2px solid var(--secondary-accent);
-    box-shadow: 0 0 10px rgba(139, 233, 253, 0.5);
-}
-.crystal-button:active {
-    transform: scale(0.95);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-.crystal-button:disabled {
-    background-color: rgba(255, 255, 255, 0.2);
-    cursor: not-allowed;
-    box-shadow: none;
-    color: rgba(255, 255, 255, 0.5);
-}
-.crystal-button:disabled:hover {
-    transform: none; /* Prevent hover effects on disabled buttons */        
-}
-.crystal-button:disabled:focus {
-    outline: none; /* Remove focus outline for disabled buttons */
-}
-.crystal-button:disabled:active {
-    transform: none; /* Prevent active effects on disabled buttons */
-}
-.crystal-link {
-    color: #b7e4c7;
-    text-decoration: none; /* Remove underline for links */
-    transition: color 0.2s ease;
-}
-.crystal-link:hover {
-    color: var(--secondary-accent);
-    text-decoration: none; /* Add underline on hover */
-}
-.crystal-link:visited {
-    text-decoration: none;
-}
-.journal-card {
-    position: relative;
-    padding: 40px 20px;
-    text-decoration: none;
-    color: white;
-    border: 2px solid transparent;
-    box-shadow: 0 4px 24px rgba(139, 233, 253, 0.08), 0 1.5px 8px rgba(233, 69, 96, 0.08);
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
-    transition: box-shadow 0.4s cubic-bezier(.4,2,.3,1), border-color 0.3s;
-    
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    cursor: pointer; /* Makes it clear the whole card is clickable */
-    width: 100%;     /* Ensures it fills the grid/tile area */
-    height: 100%;    /* Ensures it fills the grid/tile area */
-}   
-.journal-card:hover .delete-button {
-    opacity: 1;
-    transform: scale(1.1);
-}
-.journal-card:visited {
-    color: white;
-    text-decoration: none; /* Remove underline for visited links */
-}
-.journal-card .delete-button {
-    pointer-events: auto;
-    opacity: 0;
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 36px;
-    height: 36px;
-    background-color: rgba(233, 69, 96, 0.85);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.3rem;
-    font-weight: bold;
-    z-index: 10;
-    transition: opacity 0.2s ease, transform 0.2s ease, background 0.2s;
-}
-.journal-card a,
-.journal-card a:visited,
-.journal-card a:active,
-.journal-card a:hover {
-  color: white !important;
-  text-decoration: none !important;
-}
-
-/* Ensure the delete button is above the clickable card area */
-.journal-card {
-    pointer-events: auto;
-}
-.journal-card .delete-button {
-    pointer-events: auto;
-}
-
-/* Trippy wavy black-and-white background */
-.bg-trippy-waves {
-  background: repeating-linear-gradient(
-    120deg,
-    #fff 0px 20px,
-    #000 20px 40px
-  );
-  background-size: 200% 200%;
-  animation: trippy-waves-anim 8s ease-in-out infinite;
-  filter: blur(0.5px) brightness(1.1) contrast(1.2);
-}
-
-@keyframes trippy-waves-anim {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-.bg-mandelbrot-swirl {
-    background-color: #000;
-    background-image:
-        radial-gradient(circle at 20% 20%, #fff 1%, #000 5%, #fff 10%, #000 15%),
-        radial-gradient(circle at 80% 30%, #fff 2%, #000 8%, #fff 15%, #000 20%),
-        radial-gradient(circle at 70% 80%, #fff 3%, #000 7%, #fff 12%, #000 18%),
-        radial-gradient(circle at 30% 70%, #fff 1%, #000 6%, #fff 13%, #000 19%);
-    background-size: 200% 200%, 150% 150%, 180% 180%, 160% 160%;
-    animation: mandelbrot-swirl-anim 25s linear infinite;
-}
-@keyframes mandelbrot-swirl-anim {
-    from { transform: rotate(0deg); background-position: 0% 50%, 50% 100%, 100% 0%, 0% 0%; }
-    to { transform: rotate(360deg); background-position: 100% 50%, 0% 0%, 50% 100%, 100% 100%; }
-}
-.crystal-page-container,
-.crystal-page-layout,
-.crystal-summary-sidebar,
-.journal-area {
-    height: auto !important;
-    max-height: none !important;
-    overflow: visible !important;
-}
+.loader-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 20px; background-color: rgba(0, 0, 0, 0.5); z-index: 999; }
+.loader-crystal { font-size: 50px; animation: pulse 2s infinite ease-in-out; }
+@keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } }
