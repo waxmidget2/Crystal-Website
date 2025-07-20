@@ -53,6 +53,7 @@ body::-webkit-scrollbar-thumb {
     padding: 5vh 5vw;
     display: flex;
     flex-direction: column;
+    height: auto !important;
 }
 
 /* --- HOLOGRAM THEME STYLES --- */
@@ -443,7 +444,8 @@ body::-webkit-scrollbar-thumb {
     cursor: pointer; /* Makes it clear the whole card is clickable */
     width: 100%;     /* Ensures it fills the grid/tile area */
     height: 100%;    /* Ensures it fills the grid/tile area */
-}
+    overflow: visible !important;
+}   
 .journal-card:hover { 
     transform: translateY(-5px); 
     border-color: var(--secondary-accent); 
@@ -483,7 +485,7 @@ body::-webkit-scrollbar-thumb {
 .crystal-page-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; width: 100%; }
 .crystal-summary-sidebar, .journal-area { padding: 30px; }
 
-.summary-image { width: 100%; max-width: 250px; height: 250px; object-fit: cover; border-radius: 50%; margin-bottom: 20px; border: 5px solid; box-shadow: 0 0 25px rgba(255,255,255,0.1); background-color: rgba(0,0,0,0.3); }
+.summary-image { width: 100%; max-width: 250px; height: 250px; object-fit: cover; border-radius: 50%; margin-bottom: 20px; border: 5px solid; box-shadow: 0 0 25px rgba(0,255,255,0.1); background-color: rgba(0,0,0,0.3); }
 .summary-title { font-size: 2.8rem; margin-bottom: 15px; font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.4); }
 .summary-text { font-size: 1.2rem; line-height: 1.7; color: var(--font-color-muted); white-space: pre-wrap; }
 .summary-text-editable { cursor: pointer; padding: 10px; border-radius: 10px; transition: background-color 0.2s ease; }
@@ -602,6 +604,7 @@ body::-webkit-scrollbar-thumb {
     cursor: pointer; /* Makes it clear the whole card is clickable */
     width: 100%;     /* Ensures it fills the grid/tile area */
     height: 100%;    /* Ensures it fills the grid/tile area */
+    overflow: visible !important;
 }   
 .journal-card:hover .delete-button {
     opacity: 1;
@@ -685,12 +688,28 @@ body::-webkit-scrollbar-thumb {
     from { transform: rotate(0deg); background-position: 0% 50%, 50% 100%, 100% 0%, 0% 0%; }
     to { transform: rotate(360deg); background-position: 100% 50%, 0% 0%, 50% 100%, 100% 100%; }
 }
+html, body, #root {
+    height: auto !important;
+    min-height: 100vh !important;
+    max-height: none !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+}
+
+.App {
+    height: auto !important;
+    min-height: 100vh !important;
+    max-height: none !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+}
+
 .crystal-page-container,
 .crystal-page-layout,
 .crystal-summary-sidebar,
 .journal-area {
-    min-height: 0 !important;
     height: auto !important;
+    min-height: 0 !important;
     max-height: none !important;
     overflow: visible !important;
 }
