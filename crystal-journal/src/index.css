@@ -663,8 +663,8 @@ body {
 }
 
 /* Make main boxes scrollable and style scrollbars */
-/* filepath: /workspaces/Crystal-Website/crystal-journal/src/index.css*/
-
+/* filepath: /workspaces/Crystal-Website/crystal-journal/src/index.css
+*/
 .App,
 .crystal-page-container,
 .crystal-page-layout,
@@ -673,7 +673,7 @@ body {
 .modal-content {
     overflow-y: auto !important;
     overflow-x: hidden !important;
-    max-height: 400vh;
+    max-height: 80vh;
     scrollbar-width: thin;
     scrollbar-color: var(--secondary-accent) var(--glass-bg);
     border-radius: var(--border-radius-main);
@@ -708,86 +708,6 @@ body {
 .journal-area::-webkit-scrollbar-track,
 .crystal-summary-sidebar::-webkit-scrollbar-track,
 .modal-content::-webkit-scrollbar-track {
-    background: var(--glass-bg);
-    border-radius: 10px;
-}
-
-/* Make the grid area scrollable with beautiful scrollbars */
-
-.home-grid,
-.journal-grid {
-    max-height: 60vh;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding-bottom: 20px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--secondary-accent) var(--glass-bg);
-    border-radius: var(--border-radius-main);
-}
-
-/* Chrome, Edge, Safari scrollbar styles */
-.home-grid::-webkit-scrollbar,
-.journal-grid::-webkit-scrollbar {
-    width: 10px;
-    background: var(--glass-bg);
-    border-radius: var(--border-radius-main);
-}
-.home-grid::-webkit-scrollbar-thumb,
-.journal-grid::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, var(--secondary-accent), var(--primary-accent));
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-}
-.home-grid::-webkit-scrollbar-track,
-.journal-grid::-webkit-scrollbar-track {
-    background: var(--glass-bg);
-    border-radius: 10px;
-}
-
-/* Universal scrollable layout, no fixed heights, no nested scrollbars */
-
-html, body, #root {
-    min-height: 100vh !important;
-    height: auto !important;
-    max-height: none !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-}
-
-.App {
-    min-height: 100vh !important;
-    height: auto !important;
-    max-height: none !important;
-    overflow-x: hidden !important;
-    overflow-y: visible !important;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-}
-
-.crystal-page-container,
-.crystal-page-layout,
-.journal-area,
-.crystal-summary-sidebar,
-.modal-content {
-    overflow: visible !important;
-    max-height: none !important;
-    height: auto !important;
-}
-
-/* Beautiful scrollbars for the whole page */
-body::-webkit-scrollbar {
-    width: 12px;
-    background: var(--glass-bg);
-    border-radius: 10px;
-}
-body::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, var(--secondary-accent), var(--primary-accent));
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-}
-body::-webkit-scrollbar-track {
     background: var(--glass-bg);
     border-radius: 10px;
 }
