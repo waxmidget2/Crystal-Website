@@ -38,6 +38,15 @@ body {
     transition: background-color 0.5s ease;
 }
 
+body::-webkit-scrollbar {
+    width: 8px;
+    background: transparent;
+}
+body::-webkit-scrollbar-thumb {
+    background: var(--secondary-accent);
+    border-radius: 8px;
+}
+
 .App {
     width: 100%;
     min-height: 100vh;
@@ -372,10 +381,7 @@ body {
 .login-prompt { text-align: center; padding: 50px; align-self: center; }
 .page-content-container { width: 100%; max-width: 1200px; display: flex; flex-direction: column; align-items: center; align-self: center; }
 .journal-area {
-    max-height: 70vh;
-    overflow-y: auto;
     padding: 30px;
-    /* keep other styles */
 }
 .page-content-container::-webkit-scrollbar,
 .journal-area::-webkit-scrollbar {
@@ -476,12 +482,6 @@ body {
 .crystal-page-container { width: 100%; max-width: 1200px; display: flex; flex-direction: column; gap: 20px; align-self: center; }
 .crystal-page-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; width: 100%; height: auto; }
 .crystal-summary-sidebar, .journal-area { padding: 30px;}
-.crystal-summary-sidebar {
-    max-height: 70vh;
-    overflow-y: auto;
-    padding: 30px;
-    /* keep other styles */
-}
 
 .summary-image { width: 100%; max-width: 250px; height: 250px; object-fit: cover; border-radius: 50%; margin-bottom: 20px; border: 5px solid; box-shadow: 0 0 25px rgba(255,255,255,0.1); background-color: rgba(0,0,0,0.3); }
 .summary-title { font-size: 2.8rem; margin-bottom: 15px; font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.4); }
