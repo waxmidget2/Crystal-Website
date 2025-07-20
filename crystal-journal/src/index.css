@@ -743,3 +743,51 @@ body {
     background: var(--glass-bg);
     border-radius: 10px;
 }
+
+/* Universal scrollable layout, no fixed heights, no nested scrollbars */
+
+html, body, #root {
+    min-height: 100vh !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+}
+
+.App {
+    min-height: 100vh !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.crystal-page-container,
+.crystal-page-layout,
+.journal-area,
+.crystal-summary-sidebar,
+.modal-content {
+    overflow: visible !important;
+    max-height: none !important;
+    height: auto !important;
+}
+
+/* Beautiful scrollbars for the whole page */
+body::-webkit-scrollbar {
+    width: 12px;
+    background: var(--glass-bg);
+    border-radius: 10px;
+}
+body::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--secondary-accent), var(--primary-accent));
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+body::-webkit-scrollbar-track {
+    background: var(--glass-bg);
+    border-radius: 10px;
+}
